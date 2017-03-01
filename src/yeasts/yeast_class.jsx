@@ -167,7 +167,7 @@ export class Yeast {
                           .attr("id", "yeast--" + this.variables.title)
                           .attr("transform", "translate(0 -" + this.variables.r/3 + ")")
                           .attr("text-anchor", "middle")
-                          .attr("font-size", this.variables.r * 0.2 + "px")
+                          .attr("font-size", this.variables.r * 0.22 + "px")
                           .attr("font-weight", "bold")
                           .text(this.variables.title)
 
@@ -175,7 +175,7 @@ export class Yeast {
                            .textualParts
                            .append("text")
                            .attr("text-anchor", "middle")
-                           .attr("font-size", "10px")
+                           .attr("font-size", this.variables.r * 0.15 + "px")
                            .text(this.variables.header)
 
     this.text.descriptionText = this.text
@@ -184,7 +184,7 @@ export class Yeast {
                                     .attr("class", "yeast--description")
                                     .attr("transform", "translate(0 " + this.variables.r/3 + ")")
                                     .attr("text-anchor", "middle")
-                                    .attr("font-size", "14px")
+                                    .attr("font-size", this.variables.r * 0.18 + "px")
                                     .style('opacity', 1)
                                     .text(this.variables.descriptionArray[0])
                                     .attr("idx", 0)
@@ -460,11 +460,11 @@ export class Yeast {
 
       mitochondria.append("path")
                   .attr("d", this.invariables.radialLineGenerator(mitocondriaPoints))
-                  .attr("fill", "#F5F5DC")
+                  .attr("fill", "#abab9a")
 
       mitochondria.append("path")
                   .attr("d", this.invariables.radialLineGenerator(wormPoints))
-                  .attr("fill", "#abab9a")
+                  .attr("fill", "#F5F5DC")
     })
   }
 
@@ -542,7 +542,7 @@ export class Yeast {
               .attr("transform", "translate(" + (position.x - 20) + " " + (position.y + this.variables.hugeR / 3) + ")")
               .text(Math.round(ratio * 1000)/10 + "%")
               .attr("fill", "black")
-              .attr("font-size","20px")
+              .attr("font-size", this.variables.hugeR / 10 + "px")
   }
 
   chromosomeColor(language) {

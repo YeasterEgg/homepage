@@ -1,16 +1,17 @@
 const d3 = require('d3')
 const io = require('socket.io-client')
-const socket = io()
 
 const Yeast = require ('./yeasts/yeast_class.jsx').Yeast
 const addDefs = require ('./yeasts/defs.jsx').addDefs
-const drawLegend = require ('./yeasts/legend.jsx').drawLegend
+const addLegend = require ('./yeasts/legend.jsx').drawLegend
 
+const socket = io()
 const w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
 const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
-const yeastRadius = 70
-const maxFoodWeight = 1
-const maxFoodRadius = 15
+const screenRatio = w / h
+const yeastRadius = Math.floor(Math.min(w,h) / 10)
+
+let population = {}
 const colors = {
   "JavaScript": "url(#blueLinearGradient)",
   "Python": "url(#redLinearGradient)",
@@ -38,8 +39,6 @@ const adamHash = {
   colorPalette: colors
 }
 
-let population = {}
-
 const yeastHash = (websiteData, position) => {
   return {
     w: w,
@@ -60,26 +59,16 @@ const yeastHash = (websiteData, position) => {
   }
 }
 
-const drawContainer = (containerId) => {
-  const container = d3.select(containerId)
+export const drawWebsites = (websites) => {
+  const container = d3.select("#yeast")
                       .append("svg")
-  return container
-}
-
-const drawSvg = (container) => {
   const svg = container.attr("width", w+"px")
                        .attr("height", h+"px")
                        .append("g")
                        .style("filter", "url(#gooey)")
+
+  addLegend(container, colors, population)
   addDefs(svg)
-  return svg
-}
-
-export const drawWebsites = (websites) => {
-  const container = drawContainer("#yeast")
-  const svg = drawSvg(container)
-
-  drawLegend(container, colors, population)
 
   const adam = new Yeast(adamHash)
   adam.birth(svg, population)
@@ -88,8 +77,8 @@ export const drawWebsites = (websites) => {
   websites.map( (website, i) => {
     const angle = Math.PI * 2 * (i + 1) / websitesLength
     const position = {
-      x: yeastRadius * (Math.random() * 2 + 3) * Math.cos(angle),
-      y: yeastRadius * (Math.random() * 2 + 3) * Math.sin(angle),
+      x: yeastRadius * (Math.random() * 2 + w / (yeastRadius * 4)) * Math.cos(angle),
+      y: yeastRadius * (Math.random() * 2 + h / (yeastRadius * 4)) * Math.sin(angle),
     }
     const webHash = yeastHash(website, position)
     setTimeout( () => {
