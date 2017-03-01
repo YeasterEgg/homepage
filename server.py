@@ -9,8 +9,6 @@ from os.path import dirname, join
 from os import getenv
 from git_reader import update_json
 
-import threading
-import time
 import json
 import grequests
 import pdb
@@ -58,11 +56,6 @@ def sites():
   json_file.close()
   return jsonify(data)
 
-@app.route("/telegram", methods=["POST"])
-def telegram():
-  message = request.get_json()
-  return jsonify({"result": "ok"})
-
 @app.route("/update_data", methods=["POST"])
 def update_data():
   update_json(DB_FILE)
@@ -88,18 +81,5 @@ def visited_website(website):
 def researched_recipe(recipe, url):
   socketio.emit('recipe_searched', {'recipe_name': recipe, 'url': url})
 
-def tell_me(ip):
-  data = {
-    "chat_id": CHAT_ID,
-    "text": "We strunz, qualcuno ci ha visitati dall'ip {ip}, micacazzi!".format(ip=ip),
-  }
-  url = "https://api.telegram.org/bot{token}/sendMessage".format(token=TELEGRAM_TOKEN)
-  req = grequests.post(url, data=data)
-  grequests.map([req])
-
-thread = threading.Thread(target=update_json, args=[DB_FILE])
-
 if __name__ == "__main__":
-  if(app.config['DEBUG'] == False):
-    thread.start()
   socketio.run(app, host="127.0.0.1", port=4002, debug=app.config['DEBUG'])
