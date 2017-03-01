@@ -8,67 +8,11 @@
     <meta name="description" content="Yeasteregg">
     <meta name="keywords" content="geosmine petrichor">
     <meta name="author" content="Yeasteregg">
-    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}">
-    <link rel="icon" type="image/png" href="{{url_for('static', filename='favicon.png')}}" />
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/index.css')}}">
+    <link rel="icon" type="image/png" href="/favicon" />
   </head>
   <body>
-
-  <div class="container">
-    <div class="title">
-      Elenco siti su questo dominio.
-    </div>
-    <div class="website">
-      <div class="site_name">
-        <a href="https://coop.yegg.it" target="_blank" >Coop Jukebox</a>
-        <a href="https://github.com/YeasterEgg/coopjukebox" target="_blank"><img src="{{url_for('static', filename='github.png')}}" width="20px" height="20px"></img></a>
-      </div>
-      <div class="github_link"></div>
-      <div class="languages">(Meteor+React)</div>
-      <p>
-        Un sito che permette di creare un elenco di canzoni, farlo votare da tutti e creare progressivamente una playlist su Spotify inserendo.
-      </p>
-    </div>
-    <div class="website">
-      <div class="site_name">
-        <a href="https://pymood.yegg.it" target="_blank" >PyMood</a>
-        <a href="https://github.com/YeasterEgg/spotify_classify" target="_blank"><img src="{{url_for('static', filename='github.png')}}" width="20px" height="20px"></img></a>
-      </div>
-      <div class="languages">(Python)</div>
-      <p>
-        Un servizio API che riceve una lista di canzoni corredata dalle features offerte dall'API di Spotify e risponde dopo averla classificata (nel caso specifico, tra happy e sad). Utilizzata da Coop Jukebox. In homepage si può vedere una heatmap della correlazione di Pearson tra le variabili e i relativi scatterplot di una parte del set di training.
-      </p>
-    </div>
-    <div class="website">
-      <div class="site_name">
-        <a href="https://barille.yegg.it?commander" target="_blank" >Barille</a>
-        <a href="https://github.com/YeasterEgg/barille" target="_blank"><img src="{{url_for('static', filename='github.png')}}" width="20px" height="20px"></img></a>
-      </div>
-      <div class="languages">(Meteor+Aframe)</div>
-      <p>
-        Un sito che permette di caricare e visualizzare una proteina caricata da un file .pdb. Mentre un utente (che accede con parametro '?commander') può muoversi liberamente, tutti gli utenti che accedono senza il parametro seguono il movimento. Da mobile è possibile usare un visore VR per avere una visione più immersiva della molecola.
-      </p>
-    </div>
-    <div class="website">
-      <div class="site_name">
-        <a href="https://menuadhocbot.yegg.it/" target="_blank" >Menu ad Hoc Bot</a>
-        <a href="https://github.com/YeasterEgg/menuadhocbot" target="_blank"><img src="{{url_for('static', filename='github.png')}}" width="20px" height="20px"></img></a>
-      </div>
-      <div class="languages">(Ruby+Api.ai)</div>
-      <p>
-        Un bot Telegram collegato al blog di ricette <a href="https://menuadhoc.it" target="_blank">Menu ad Hoc</a> che tramite Api.ai permette di ricercare con facilità ricette per ingrediente, con la capacità di riconoscere la richiesta, e che ricontatta dopo il tempo di durata della ricetta per richiedere informazioni.
-      </p>
-    </div>
-    <div class="website">
-      <div class="site_name">
-        <a href="https://forgetmebot.yegg.it/" target="_blank" >ForgetMeBot</a>
-        <a href="https://github.com/YeasterEgg/forgetmebot" target="_blank"><img src="{{url_for('static', filename='github.png')}}" width="20px" height="20px"></img></a>
-      </div>
-      <div class="languages">(Ruby)</div>
-      <p>
-        Un bot Telegram cui è possibile chiedere di ricordare un evento nei minuti/ore/giorni successivi, e di ricordarlo ad altri utenti cui ci si può collegare tramite "amicizie".
-      </p>
-    </div>
-  </div>
-
+    <div id="yeast"></div>
+    <script src="{{url_for('static', filename='bundle.js')}}"></script>
   </body>
 </html>

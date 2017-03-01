@@ -4,16 +4,17 @@
   "description": "",
   "main": "d3.min.js",
   "scripts": {
-    "build": "browserify src/index.js -o templates/bundle.js --transform babelify",
-    "watch": "watchify -d src/index.js -o templates/bundle.js --transform babelify",
+    "build": "browserify src/index.jsx -o static/bundle.js --transform babelify",
+    "watch": "watchify -d src/index.jsx -o static/bundle.js --transform babelify",
     "server": "python3 server.py",
-    "sync": "browser-sync start --proxy 'localhost:4000' --files 'templates'",
+    "sync": "browser-sync start --proxy 'localhost:4002' --files 'templates' 'static'",
     "start": "npm run watch & npm run server & npm run sync"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "babel-core": "^6.21.0",
+    "babel-plugin-inferno": "^1.9.0",
     "babel-plugin-lodash": "^3.2.11",
     "babel-plugin-transform-runtime": "^6.15.0",
     "babel-polyfill": "^6.20.0",
@@ -25,7 +26,11 @@
     "watchify": "^3.8.0"
   },
   "dependencies": {
+    "babel-preset-react": "^6.23.0",
     "color": "^1.0.3",
-    "d3": "^4.4.1"
+    "d3": "^4.6.0",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "socket.io-client": "^1.7.3"
   }
 }
