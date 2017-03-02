@@ -43,7 +43,7 @@ export class Yeast {
 
     this.invariables = {
       population: null,
-      hugeMultiplier: data.r * 4,
+      hugeMultiplier: 4,
       membranePointNumber: Math.round(data.r / 5),
       organellePointNumber: Math.round(data.r / 2),
       organellePositionsArray: this.shuffleArray([["-", "-"], ["","-"], ["-",""], ["", ""]]),
@@ -322,11 +322,11 @@ export class Yeast {
   }
 
   hide() {
-    this.hideGroup(this.structures.cell, 1000, 0)
+    this.hideGroup(this.structures.cell, 1400, 0)
   }
 
   show() {
-    this.showGroup(this.structures.cell, 1000, 1)
+    this.showGroup(this.structures.cell, 600, 1)
     this.breathe()
   }
 
