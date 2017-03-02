@@ -336,13 +336,13 @@ export class Yeast {
                                      .cell
                                      .append("g")
                                      .style("opacity", 0.1)
-    this.drawSimpleNucleus()
-    this.drawSimpleMitochondria()
-    this.drawSimpleGolgi()
+    this.drawNucleus()
+    this.drawMitochondria()
+    this.drawGolgi()
     this.drawDna()
   }
 
-  drawSimpleNucleus() {
+  drawNucleus() {
     const signs = this.invariables.organellePositionsArray[0]
     const nucleusPoints = this.randomCirclePointsGenerator(this.invariables.organellePointNumber, this.variables.r * 0.3)
     const nucleulusPoints = this.randomCirclePointsGenerator(this.invariables.organellePointNumber, this.variables.r * 0.1)
@@ -370,7 +370,7 @@ export class Yeast {
         .attr("transform", "translate(" + (0.2 * nucleusTranslate.x) + " " + (0.2 * nucleusTranslate.y) + ")")
   }
 
-  drawSimpleMitochondria() {
+  drawMitochondria() {
     const signsArray = this.invariables.organellePositionsArray.slice(1,3)
     signsArray.map( (signs) => {
       const rotation = Math.random()
@@ -391,7 +391,7 @@ export class Yeast {
     })
   }
 
-  drawSimpleGolgi() {
+  drawGolgi() {
     const signs = this.invariables.organellePositionsArray[3]
     const golgi = this.structures
                       .organelles
@@ -422,7 +422,7 @@ export class Yeast {
 
   drawChromosome(gene, idx, ploidy, total) {
     const value = this.variables.genome[gene]
-    const height =  0.125 * this.variables.hugeR * Math.log(value) / Math.log(total)
+    const height =  0.1 * this.variables.hugeR * Math.log(value) / Math.log(total)
     const part = idx / (ploidy - 1)
     const ratio = value / total
     const position = {
@@ -446,10 +446,10 @@ export class Yeast {
               .attr("transform", "translate(" + position.x + " " + position.y + ")")
 
     chromosome.append("text")
-              .attr("transform", "translate(" + (position.x - 20) + " " + (position.y + this.variables.hugeR / 3) + ")")
+              .attr("transform", "translate(" + (position.x - this.variables.hugeR / 12) + " " + (position.y + this.variables.hugeR / 3) + ")")
               .text(Math.round(ratio * 1000)/10 + "%")
               .attr("fill", "black")
-              .attr("font-size", this.variables.hugeR / 10 + "px")
+              .attr("font-size", this.variables.hugeR / 12 + "px")
   }
 
   chromosomeColor(language) {
