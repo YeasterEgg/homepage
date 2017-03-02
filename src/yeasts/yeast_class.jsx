@@ -10,7 +10,6 @@ export class Yeast {
       r: data.r,
       x: data.x,
       y: data.y,
-      hugeR: data.r * 4,
       color: data.color,
       title: data.title,
       gitUrl: data.git,
@@ -21,7 +20,6 @@ export class Yeast {
       first: data.first,
       name: data.name,
       colorPalette: data.colorPalette,
-      textVisible: true,
       cellTransform: null
     }
 
@@ -45,6 +43,7 @@ export class Yeast {
 
     this.invariables = {
       population: null,
+      hugeMultiplier: data.r * 4,
       membranePointNumber: Math.round(data.r / 5),
       organellePointNumber: Math.round(data.r / 2),
       organellePositionsArray: this.shuffleArray([["-", "-"], ["","-"], ["-",""], ["", ""]]),
@@ -98,7 +97,7 @@ export class Yeast {
   }
 
   breathe() {
-    const radius = this.state.huge ? this.variables.hugeR : this.variables.r
+    const radius = this.state.huge ? this.variables.r * this.invariables.hugeMultiplier : this.variables.r
     const points = this.randomCirclePointsGenerator(this.invariables.membranePointNumber, radius)
     this.structures
         .membrane
@@ -129,7 +128,7 @@ export class Yeast {
         .append("a")
         .attr("xlink:href", this.variables.gitUrl)
         .attr("target", "_blank")
-        .attr("transform", "translate(-" + ((imgWidth / 2) + (this.variables.hugeR / 3)) + " " + (this.variables.hugeR / 3) + ")")
+        .attr("transform", "translate(-" + ((imgWidth / 2) + (this.variables.r * this.invariables.hugeMultiplier / 3)) + " " + (this.variables.r * this.invariables.hugeMultiplier / 3) + ")")
         .append("svg:image")
         .attr('width', imgWidth)
         .attr('height', imgHeight)
@@ -143,7 +142,7 @@ export class Yeast {
         .append("a")
         .attr("xlink:href", this.variables.urlUrl)
         .attr("target", "_blank")
-        .attr("transform", "translate(" + (this.variables.hugeR / 3) + " " + (this.variables.hugeR / 3) + ")")
+        .attr("transform", "translate(" + (this.variables.r * this.invariables.hugeMultiplier / 3) + " " + (this.variables.r * this.invariables.hugeMultiplier / 3) + ")")
         .append("svg:image")
         .attr('width', imgWidth)
         .attr('height', imgHeight)
@@ -274,7 +273,7 @@ export class Yeast {
 
   embiggen() {
     this.state.huge = true
-    const newPoints = this.randomCirclePointsGenerator(this.invariables.membranePointNumber, this.variables.hugeR)
+    const newPoints = this.randomCirclePointsGenerator(this.invariables.membranePointNumber, this.variables.r * this.invariables.hugeMultiplier)
     this.structures
         .membrane
         .transition()
@@ -410,7 +409,8 @@ export class Yeast {
                               .cell
                               .append("g")
                               .style("opacity", 0)
-                              .attr("transform", "translate(0,-" + this.variables.hugeR / 2 + ")")
+                              .attr("display", "none")
+                              .attr("transform", "translate(0,-" + this.variables.r * this.invariables.hugeMultiplier / 2 + ")")
 
     const ploidy = Object.keys(this.variables.genome).length
     const total = Object.values(this.variables.genome).reduce((a, b) => a + b, 0)
@@ -422,11 +422,11 @@ export class Yeast {
 
   drawChromosome(gene, idx, ploidy, total) {
     const value = this.variables.genome[gene]
-    const height =  0.1 * this.variables.hugeR * Math.log(value) / Math.log(total)
+    const height =  0.1 * this.variables.r * this.invariables.hugeMultiplier * Math.log(value) / Math.log(total)
     const part = idx / (ploidy - 1)
     const ratio = value / total
     const position = {
-      x: -this.variables.hugeR / 2 + this.variables.hugeR * part,
+      x: -this.variables.r * this.invariables.hugeMultiplier / 2 + this.variables.r * this.invariables.hugeMultiplier * part,
       y: 0
     }
     const chromosome = this.structures.dna.append("g")
@@ -446,10 +446,10 @@ export class Yeast {
               .attr("transform", "translate(" + position.x + " " + position.y + ")")
 
     chromosome.append("text")
-              .attr("transform", "translate(" + (position.x - this.variables.hugeR / 12) + " " + (position.y + this.variables.hugeR / 3) + ")")
+              .attr("transform", "translate(" + (position.x - this.variables.r * this.invariables.hugeMultiplier / 12) + " " + (position.y + this.variables.r * this.invariables.hugeMultiplier / 3) + ")")
               .text(Math.round(ratio * 1000)/10 + "%")
               .attr("fill", "black")
-              .attr("font-size", this.variables.hugeR / 12 + "px")
+              .attr("font-size", this.variables.r * this.invariables.hugeMultiplier / 12 + "px")
   }
 
   chromosomeColor(language) {
@@ -565,7 +565,7 @@ export class Yeast {
   }
 
   goCrazy(){
-    const radius = this.state.huge ? this.variables.hugeR : this.variables.r
+    const radius = this.state.huge ? this.variables.r * this.invariables.hugeMultiplier : this.variables.r
     const points = this.randomCirclePointsGenerator(this.invariables.membranePointNumber, radius, 1.5)
     this.structures
         .membrane
@@ -577,7 +577,7 @@ export class Yeast {
   }
 
   calmDown(){
-    const radius = this.state.huge ? this.variables.hugeR : this.variables.r
+    const radius = this.state.huge ? this.variables.r * this.invariables.hugeMultiplier : this.variables.r
     const points = this.randomCirclePointsGenerator(this.invariables.membranePointNumber, radius)
     this.structures
         .membrane
