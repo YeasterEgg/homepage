@@ -585,7 +585,12 @@ export class Yeast {
         .duration(2000)
         .ease(d3.easeQuadInOut)
         .attr("d", this.invariables.radialLineGenerator(points))
-        .on("end", () => {this.breathe()})
+        .on("end", () => {
+          this.breathe()
+          this.structures
+              .membrane
+              .attr("fill", this.variables.color)
+        })
   }
 
 }
