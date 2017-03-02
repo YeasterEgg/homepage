@@ -45,8 +45,8 @@ export class Yeast {
 
     this.invariables = {
       population: null,
-      membranePointNumber: 12,
-      organellePointNumber: 30,
+      membranePointNumber: Math.round(data.r / 5),
+      organellePointNumber: Math.round(data.r / 2),
       organellePositionsArray: this.shuffleArray([["-", "-"], ["","-"], ["-",""], ["", ""]]),
       radialLineGenerator: d3.radialLine()
                              .curve(d3.curveBasisClosed)
