@@ -94,7 +94,6 @@ export class Yeast {
                                    .attr("d", this.invariables.radialLineGenerator(points))
                                    .attr("fill", this.variables.color)
                                    .attr("class", "yeast--mother yeast--breathing yeast--" + this.variables.title)
-    this.state.breathing = true
     this.breathe()
   }
 
@@ -136,7 +135,7 @@ export class Yeast {
         .attr('height', imgHeight)
         .attr("xlink:href","static/pics/github.png")
         .on("click", () => {
-          this.urlClicked()
+          d3.event.stopPropagation()
         })
 
     this.structures
@@ -150,7 +149,7 @@ export class Yeast {
         .attr('height', imgHeight)
         .attr("xlink:href", this.variables.first ? "static/pics/linkedin.png" : "static/pics/web.png")
         .on("click", () => {
-          this.urlClicked()
+          d3.event.stopPropagation()
         })
   }
 
@@ -188,38 +187,8 @@ export class Yeast {
                                     .style('opacity', 1)
                                     .text(this.variables.descriptionArray[0])
                                     .attr("idx", 0)
-    this.showText()
+    this.showGroup(this.text.textualParts, 800, 1)
     this.cycleDescription()
-  }
-
-  urlClicked(){
-    d3.event.stopPropagation()
-  }
-
-  showText(){
-    this.text
-        .textualParts
-        .transition()
-        .duration(1000)
-        .style("opacity", 1)
-  }
-
-  showGems(){
-    this.structures
-        .gems
-        .attr("display", "block")
-        .transition()
-        .duration(800)
-        .style("opacity", 1)
-  }
-
-  hideGems(){
-    this.structures
-        .gems
-        .transition()
-        .duration(800)
-        .style("opacity", 0)
-        .attr("display", "none")
   }
 
   cycleDescription() {
@@ -256,33 +225,15 @@ export class Yeast {
 
   onCellHover() {
     if(!this.state.huge){
-      this.text
-          .textualParts
-          .transition()
-          .duration(200)
-          .style("opacity", 0.1)
-
-      this.structures
-          .organelles
-          .transition()
-          .duration(200)
-          .style("opacity", 1)
+      this.showGroup(this.text.textualParts, 300, 0.1)
+      this.showGroup(this.structures.organelles, 300, 1)
     }
   }
 
   onCellOut() {
     if(!this.state.huge){
-      this.structures
-          .organelles
-          .transition()
-          .duration(200)
-          .style("opacity", 0.1)
-
-      this.text
-          .textualParts
-          .transition()
-          .duration(200)
-          .style("opacity", 1)
+      this.showGroup(this.structures.organelles, 300, 0.1)
+      this.showGroup(this.text.textualParts, 300, 1)
     }
   }
 
@@ -330,18 +281,18 @@ export class Yeast {
         .duration(1000)
         .attr("d", this.invariables.radialLineGenerator(newPoints))
         .on("end", () => {
-          this.hideOrganelles()
-          this.showGenome()
+          this.hideGroup(this.structures.organelles, 800, 0)
+          this.showGroup(this.structures.dna, 800, 1)
+          this.showGroup(this.structures.gems, 800, 1)
+          this.showGroup(this.text.textualParts, 800, 1)
           this.breathe()
-          this.showText()
-          this.showGems()
         })
   }
 
   smaller(callback) {
     const newPoints = this.randomCirclePointsGenerator(this.invariables.membranePointNumber, this.variables.r)
-    this.hideGenome()
-    this.hideGems()
+    this.hideGroup(this.structures.gems, 800, 0)
+    this.hideGroup(this.structures.dna, 800, 0)
     this.structures
         .membrane
         .transition()
@@ -350,7 +301,7 @@ export class Yeast {
         .on("end", () => {
           this.state.huge = false
           this.breathe()
-          this.showOrganelles()
+          this.showGroup(this.structures.organelles, 800, 1)
           callback()
         })
   }
@@ -372,24 +323,12 @@ export class Yeast {
   }
 
   hide() {
-    this.state.breathing = false
-    this.structures
-        .cell
-        .transition()
-        .duration(1000)
-        .style("opacity", 0)
-        .on("end", () => {this.structures.cell.style("display", "none")})
+    this.hideGroup(this.structures.cell, 1000, 0)
   }
 
   show() {
-    this.state.breathing = true
+    this.showGroup(this.structures.cell, 1000, 1)
     this.breathe()
-    this.structures
-        .cell
-        .style("display", "block")
-        .transition()
-        .duration(1000)
-        .style("opacity", 1)
   }
 
   drawOrganelles() {
@@ -400,23 +339,7 @@ export class Yeast {
     this.drawSimpleNucleus()
     this.drawSimpleMitochondria()
     this.drawSimpleGolgi()
-    this.drawGenome()
-  }
-
-  hideOrganelles(){
-    this.structures
-        .organelles
-        .transition()
-        .duration(500)
-        .style("opacity", 0)
-  }
-
-  showOrganelles(){
-    this.structures
-        .organelles
-        .transition()
-        .duration(500)
-        .style("opacity", 0.1)
+    this.drawDna()
   }
 
   drawSimpleNucleus() {
@@ -482,7 +405,7 @@ export class Yeast {
          .attr("transform", "rotate(" + Math.random() * 180 + ")")
   }
 
-  drawGenome() {
+  drawDna() {
     this.structures.dna = this.structures
                               .cell
                               .append("g")
@@ -495,22 +418,6 @@ export class Yeast {
     Object.keys(this.variables.genome).map( (gene, idx) => {
       this.drawChromosome(gene, idx, ploidy, total)
     })
-  }
-
-  hideGenome() {
-    this.structures
-        .dna
-        .transition()
-        .duration(800)
-        .style("opacity", 0)
-  }
-
-  showGenome() {
-    this.structures
-        .dna
-        .transition()
-        .duration(800)
-        .style("opacity", 1)
   }
 
   drawChromosome(gene, idx, ploidy, total) {
@@ -641,6 +548,20 @@ export class Yeast {
           .duration(2000)
           .attr("stop-color", "#87ceeb")
       })
+  }
+
+  showGroup(group, time = 800, finalOpacity = 1){
+    group.attr("display", "block")
+         .transition()
+         .duration(time)
+         .style("opacity", finalOpacity)
+  }
+
+  hideGroup(group, time = 800, finalOpacity = 0){
+    group.transition()
+         .duration(time)
+         .style("opacity", finalOpacity)
+         .on("end", () => {group.attr("display", "none")})
   }
 
   goCrazy(){
