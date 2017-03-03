@@ -2,6 +2,7 @@ const d3 = require('d3')
 const io = require('socket.io-client')
 
 const Yeast = require ('./yeasts/yeast_class.jsx').Yeast
+const Petri = require ('./yeasts/petri_class.jsx').Petri
 const addDefs = require ('./yeasts/defs.jsx').addDefs
 const addLegend = require ('./yeasts/legend.jsx').drawLegend
 
@@ -21,27 +22,15 @@ const colors = {
   "None": "white",
 }
 
-const adamHash = {
+const petriHash = {
   w: w,
   h: h,
-  r: yeastRadius * 1.3,
+  r: yeastRadius * 1.5,
   x: w / 2,
   y: h / 2,
-  color: "url(#radialGradient)",
-  title: "Luca Mattiazzi",
-  git: "https://github.com/YeasterEgg",
-  url: "https://www.linkedin.com/in/mattiazziluca",
-  header: "Currently interested in:",
-  description: ["Molecular Dynamics", "Backend Development", "Biotechnology", "Data Science", "Bioinformatics", "Neural Networks", "Data Visualization"],
-  genome: {},
-  first: true,
-  name: "luca",
-  colorPalette: colors,
-  draggable: false,
-  socket: socket
 }
 
-const yeastHash = (websiteData, position) => {
+const yeastHash = (websiteData, position, petriDish) => {
   return {
     w: w,
     h: h,
@@ -55,11 +44,10 @@ const yeastHash = (websiteData, position) => {
     header: "Technologies used:",
     description: websiteData.languages,
     genome: websiteData.ratios,
-    first: false,
     name: websiteData.name,
     colorPalette: colors,
-    draggable: true,
-    socket: socket
+    socket: socket,
+    petriDish: petriDish
   }
 }
 
@@ -74,17 +62,20 @@ export const drawWebsites = (websites) => {
   addLegend(container, colors, population)
   addDefs(svg)
 
-  const adam = new Yeast(adamHash)
-  adam.birth(svg, population)
-  const websitesLength = websites.length
+  // const adam = new Yeast(adamHash)
+  // adam.birth(svg, population)
 
+  const petriDish = new Petri(petriHash)
+  petriDish.put(svg)
+
+  const websitesLength = websites.length
   websites.map( (website, i) => {
     const angle = Math.PI * 2 * (i + 1) / websitesLength
     const position = {
       x: yeastRadius * (Math.random() * 2 + w / (yeastRadius * 4)) * Math.cos(angle),
       y: yeastRadius * (Math.random() * 2 + h / (yeastRadius * 4)) * Math.sin(angle),
     }
-    const webHash = yeastHash(website, position)
+    const webHash = yeastHash(website, position, petriDish)
     setTimeout( () => {
       const webYeast = new Yeast(webHash)
       webYeast.birth(svg, population)

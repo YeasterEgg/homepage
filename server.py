@@ -25,6 +25,7 @@ DB_FILE = "./static/db/websites.json"
 TELEGRAM_TOKEN = getenv("TELEGRAM_TOKEN")
 CHAT_ID = getenv("CHAT_ID")
 UPDATE_CODE = getenv("UPDATE_CODE")
+ENV = getenv("ENV")
 
 @app.route("/", methods=["GET"])
 def home():
@@ -80,8 +81,11 @@ def handle_my_custom_event(data):
     "text": "We strunz, qualcuno ha controllato il sito {website}, micacazzi!".format(website=website),
   }
   url = "https://api.telegram.org/bot{token}/sendMessage".format(token=TELEGRAM_TOKEN)
-  req = grequests.post(url, data=message)
-  grequests.map([req])
+  if ENV == "production":
+    req = grequests.post(url, data=message)
+    grequests.map([req])
+  else:
+    print(message["text"])
 
 def random_tuple(n = 1):
   return tuple((randint(0,255), randint(0,255), randint(0,255)) for i in range(n))
