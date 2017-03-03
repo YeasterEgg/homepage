@@ -77,9 +77,10 @@ export class Yeast {
 
     this.structures.cell.on("mouseenter", () => {this.onCellHover()} )
     this.structures.cell.on("mouseleave", () => {this.onCellOut()} )
-    this.structures.cell.call(d3.drag().on("start", () => {this.startDrag()})
-                                       .on("drag", () => {this.onDrag()})
-                                       .on("end", () => {this.endDrag()})
+    this.structures.cell.on("click", () => {this.onCellClick()} )
+    this.structures.cell.call(d3.drag().on("start", () => {this.onCellStartDrag()})
+                                       .on("drag", () => {this.onCellDrag()})
+                                       .on("end", () => {this.onCellEndDrag()})
                                         )
 
     this.drawMembrane()
@@ -394,7 +395,7 @@ export class Yeast {
           this.showGroup(this.structures.gems, 800, 1)
           this.showGroup(this.text.textualParts, 800, 1)
           this.breathe()
-          // this.variables.socket.emit('websiteSelected', { website: this.variables.name })
+          this.variables.socket.emit('websiteSelected', { website: this.variables.name })
         })
   }
 
@@ -458,11 +459,7 @@ export class Yeast {
   }
 
   onCellClick() {
-    if(!this.state.huge){
-      this.center(() => {
-        this.embiggen()
-      })
-    }else{
+    if(this.state.huge){
       this.smaller(() => {
         this.goBack()
       })
@@ -610,7 +607,7 @@ export class Yeast {
         })
   }
 
-  startDrag(){
+  onCellStartDrag(){
     this.structures.cell.raise()
     Object.keys(this.invariables.population).map( (yeastName) => {
       if(yeastName != this.variables.title && this.invariables.population[yeastName].variables.draggable){
@@ -619,7 +616,7 @@ export class Yeast {
     })
   }
 
-  onDrag(){
+  onCellDrag(){
     if(!this.state.huge){
       this.structures
           .cell
@@ -627,7 +624,7 @@ export class Yeast {
     }
   }
 
-  endDrag(){
+  onCellEndDrag(){
     Object.keys(this.invariables.population).map( (yeastName) => {
       if(yeastName != this.variables.title && this.invariables.population[yeastName].variables.draggable){
         this.invariables.population[yeastName].show()
