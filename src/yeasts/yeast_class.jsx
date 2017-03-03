@@ -60,17 +60,23 @@ export class Yeast {
     population[this.variables.name] = this
     this.structures.container = container
     this.invariables.population = population
-
     this.structures.cell = this.structures
                                .container
                                .append("g")
                                .attr("class", "yeast--container")
                                .classed("yeast--container_first", this.first)
 
-    this.structures.cell.on("mouseenter", () => {this.onCellHover()} )
-    this.structures.cell.on("mouseleave", () => {this.onCellOut()} )
-    this.structures.cell.on("click", () => {this.onCellClick()} )
+    this.variables.cellTransform = d3.zoomTransform(this.structures.cell)
 
+    // this.structures.cell.on("mouseenter", () => {this.onCellHover()} )
+    // this.structures.cell.on("mouseleave", () => {this.onCellOut()} )
+    // this.structures.cell.on("click", () => {this.onCellClick()} )
+    if(this.variables.draggable){
+      this.structures.cell.call(d3.drag().on("start", () => {this.startDrag()})
+                                         .on("drag", () => {this.onDrag()})
+                                         .on("end", () => {this.endDrag()})
+                                  )
+    }
     this.translateCell()
     this.drawMembrane()
     this.drawOrganelles()
@@ -79,12 +85,11 @@ export class Yeast {
   }
 
   translateCell(){
-    this.invariables.cellTransform = d3.zoomTransform(this.structures.cell)
-    this.invariables.cellTransform.x = this.variables.x
-    this.invariables.cellTransform.y = this.variables.y
+    this.variables.cellTransform.x = this.variables.x
+    this.variables.cellTransform.y = this.variables.y
     this.structures
         .cell
-        .attr("transform", this.invariables.cellTransform)
+        .attr("transform", this.variables.cellTransform)
   }
 
   drawMembrane() {
@@ -252,25 +257,25 @@ export class Yeast {
 
   center(callback) {
     this.removeOthers()
-    this.invariables.cellTransform.x = this.variables.w / 2
-    this.invariables.cellTransform.y = this.variables.h / 2
+    this.variables.cellTransform.x = this.variables.w / 2
+    this.variables.cellTransform.y = this.variables.h / 2
     this.structures
         .cell
         .transition()
         .duration(1000)
-        .attr("transform", this.invariables.cellTransform)
+        .attr("transform", this.variables.cellTransform)
         .on("end", () => callback() )
   }
 
   goBack() {
     this.showOthers()
-    this.invariables.cellTransform.x = this.variables.x
-    this.invariables.cellTransform.y = this.variables.y
+    this.variables.cellTransform.x = this.variables.x
+    this.variables.cellTransform.y = this.variables.y
     this.structures
         .cell
         .transition()
         .duration(1000)
-        .attr("transform", this.invariables.cellTransform)
+        .attr("transform", this.variables.cellTransform)
   }
 
   embiggen() {
@@ -324,12 +329,12 @@ export class Yeast {
     })
   }
 
-  hide() {
-    this.hideGroup(this.structures.cell, 1400, 0)
+  hide(opacity = 0, time = 1400) {
+    this.hideGroup(this.structures.cell, time, opacity)
   }
 
-  show() {
-    this.showGroup(this.structures.cell, 600, 1)
+  show(opacity = 1, time = 600) {
+    this.showGroup(this.structures.cell, time, opacity)
     this.breathe()
   }
 
@@ -596,4 +601,26 @@ export class Yeast {
         })
   }
 
+  startDrag(){
+    Object.keys(this.invariables.population).map( (yeastName) => {
+      if(yeastName != this.variables.title && this.invariables.population[yeastName].variables.draggable){
+        this.invariables.population[yeastName].show(0.5, 200)
+      }
+    })
+  }
+
+  onDrag(){
+    this.structures
+        .cell
+        .attr("transform", "translate(" + (d3.event.x)  + "," + (d3.event.y) + ")");
+  }
+
+  endDrag(){
+    this.variables.socket.emit('websiteSelected', { website: this.variables.name });
+    Object.keys(this.invariables.population).map( (yeastName) => {
+      if(yeastName != this.variables.title && this.invariables.population[yeastName].variables.draggable){
+        this.invariables.population[yeastName].show()
+      }
+    })
+  }
 }
