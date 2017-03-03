@@ -72,6 +72,17 @@ def favicon():
   img_io.seek(0)
   return send_file(img_io, mimetype='image/png')
 
+@socketio.on('websiteSelected')
+def handle_my_custom_event(data):
+  website = data["website"]
+  message = {
+    "chat_id": CHAT_ID,
+    "text": "We strunz, qualcuno ha controllato il sito {website}, micacazzi!".format(website=website),
+  }
+  url = "https://api.telegram.org/bot{token}/sendMessage".format(token=TELEGRAM_TOKEN)
+  req = grequests.post(url, data=message)
+  grequests.map([req])
+
 def random_tuple(n = 1):
   return tuple((randint(0,255), randint(0,255), randint(0,255)) for i in range(n))
 
