@@ -287,6 +287,7 @@ export class Yeast {
           this.showGroup(this.structures.gems, 800, 1)
           this.showGroup(this.text.textualParts, 800, 1)
           this.breathe()
+          this.variables.socket.emit('websiteSelected', { website: this.variables.name })
         })
   }
 
