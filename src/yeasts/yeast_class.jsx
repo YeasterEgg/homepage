@@ -20,7 +20,9 @@ export class Yeast {
       first: data.first,
       name: data.name,
       colorPalette: data.colorPalette,
-      cellTransform: null
+      cellTransform: null,
+      draggable: data.draggable,
+      socket: data.socket
     }
 
     this.state = {

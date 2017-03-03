@@ -36,7 +36,9 @@ const adamHash = {
   genome: {},
   first: true,
   name: "luca",
-  colorPalette: colors
+  colorPalette: colors,
+  draggable: false,
+  socket: socket
 }
 
 const yeastHash = (websiteData, position) => {
@@ -55,7 +57,9 @@ const yeastHash = (websiteData, position) => {
     genome: websiteData.ratios,
     first: false,
     name: websiteData.name,
-    colorPalette: colors
+    colorPalette: colors,
+    draggable: true,
+    socket: socket
   }
 }
 
