@@ -69,7 +69,7 @@ export const drawWebsites = (websites) => {
   petriDish.put(svg)
 
   const websitesLength = websites.length
-  websites.map( (website, i) => {
+  shuffleArray(websites).map( (website, i) => {
     const angle = Math.PI * 2 * (i + 1) / websitesLength
     const position = {
       x: yeastRadius * (Math.random() * 2 + w / (yeastRadius * 4)) * Math.cos(angle),
@@ -81,6 +81,18 @@ export const drawWebsites = (websites) => {
       webYeast.birth(svg, population)
     }, Math.random() * 400)
   })
+}
+
+const shuffleArray = (array) => {
+  let m = array.length
+  let t, i
+  while (m) {
+    i = Math.floor(Math.random() * m--)
+    t = array[m]
+    array[m] = array[i]
+    array[i] = t
+  }
+  return array;
 }
 
 socket.on('connect', function() {

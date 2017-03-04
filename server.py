@@ -32,6 +32,10 @@ def home():
   visited_website("Homepage")
   return render_template('index.html')
 
+@app.route("/test", methods=["GET"])
+def test():
+  return render_template('test.html')
+
 @app.route("/visited_website", methods=["GET"])
 def visited():
   website = request.args.get("site")
