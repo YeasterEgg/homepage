@@ -32,9 +32,9 @@ def home():
   visited_website("Homepage")
   return render_template('index.html')
 
-@app.route("/test", methods=["GET"])
-def test():
-  return render_template('test.html')
+@app.route("/gravity", methods=["GET"])
+def gravity():
+  return render_template('gravity.html')
 
 @app.route("/visited_website", methods=["GET"])
 def visited():

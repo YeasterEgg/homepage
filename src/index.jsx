@@ -1,23 +1,11 @@
-const yeasts = require ('./yeasts.jsx')
-const test = require ('./test.jsx')
-let startAnimation
-
-const yeastStartAnimation = () => {
-  fetch("/sites").then( (response) => {
-    return response.json()
-  }).then( (json) => {
-    yeasts.drawWebsites(json.sites)
-  })
+const modules = {
+  yeast: require ('./yeasts.jsx'),
+  gravity: require ('./gravity.jsx')
 }
 
-const testStartAnimation = () => {
-  console.log(test)
-}
-
-if(document.getElementById("yeast")){
-  startAnimation = yeastStartAnimation
-}else{
-  startAnimation = testStartAnimation
+const startAnimation = () => {
+  const currentEnv = document.body.id
+  modules[currentEnv].startAnimation()
 }
 
 document.addEventListener('DOMContentLoaded', startAnimation)

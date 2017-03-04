@@ -12,6 +12,14 @@ const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 
 const screenRatio = w / h
 const yeastRadius = Math.floor(Math.min(w,h) / 10)
 
+export const startAnimation = () => {
+  fetch("/sites").then( (response) => {
+    return response.json()
+  }).then( (json) => {
+    drawWebsites(json.sites)
+  })
+}
+
 let population = {}
 const colors = {
   "JavaScript": "url(#blueLinearGradient)",
@@ -51,8 +59,8 @@ const yeastHash = (websiteData, position, petriDish) => {
   }
 }
 
-export const drawWebsites = (websites) => {
-  const container = d3.select("#yeast")
+const drawWebsites = (websites) => {
+  const container = d3.select("body")
                       .append("svg")
   const svg = container.attr("width", w+"px")
                        .attr("height", h+"px")
