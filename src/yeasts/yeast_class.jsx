@@ -4,6 +4,8 @@ const imgWidth  = 40
 
 export class Yeast {
   constructor(data) {
+
+    // VARIABLES ASSIGNED AT CREATION
     this.variables = {
       w: data.w,
       h: data.h,
@@ -17,20 +19,23 @@ export class Yeast {
       header: data.header,
       descriptionArray: data.description,
       genome: data.genome,
-      first: data.first,
       name: data.name,
       colorPalette: data.colorPalette,
-      cellTransform: null,
-      draggable: data.draggable,
-      socket: data.socket
+      socket: data.socket,
+      petriDish: data.petriDish,
     }
 
+    // STATES
     this.state = {
       huge: false
     }
 
+    // TEXT AND STRUCTURES CREATED DURING BIRTH
     this.text = {
-      textualParts: null
+      textualParts: null,
+      title: null,
+      header: null,
+      descriptionText: null
     }
 
     this.structures = {
@@ -43,9 +48,10 @@ export class Yeast {
       mitochondria: null
     }
 
+    // CLASS VARIABLES
     this.invariables = {
       population: null,
-      hugeMultiplier: 4,
+      hugeR: data.r * 4,
       membranePointNumber: Math.round(data.r / 5),
       organellePointNumber: Math.round(data.r / 2),
       organellePositionsArray: this.shuffleArray([["-", "-"], ["","-"], ["-",""], ["", ""]]),
@@ -56,36 +62,36 @@ export class Yeast {
     }
   }
 
+  // CREATION AND MISE EN PLACE
   birth(container, population) {
     population[this.variables.name] = this
     this.structures.container = container
     this.invariables.population = population
-
     this.structures.cell = this.structures
                                .container
                                .append("g")
-                               .attr("class", "yeast--container")
-                               .classed("yeast--container_first", this.first)
+
+    this.variables.cellTransform = d3.zoomTransform(this.structures.cell)
+
+    this.structures.cell.attr("transform", this.setTranslate(this.variables.x, this.variables.y))
 
     this.structures.cell.on("mouseenter", () => {this.onCellHover()} )
     this.structures.cell.on("mouseleave", () => {this.onCellOut()} )
     this.structures.cell.on("click", () => {this.onCellClick()} )
+    // this.structures.cell.call(d3.drag().on("start", () => {this.onCellStartDrag()})
+    //                                    .on("drag", () => {this.onCellDrag()})
+    //                                    .on("end", () => {this.onCellEndDrag()})
+    //                                     )
 
-    this.translateCell()
     this.drawMembrane()
     this.drawOrganelles()
-    this.addText()
+    this.drawText()
     this.drawGems()
+
+    this.breathe()
   }
 
-  translateCell(){
-    this.invariables.cellTransform = d3.zoomTransform(this.structures.cell)
-    this.invariables.cellTransform.x = this.variables.x
-    this.invariables.cellTransform.y = this.variables.y
-    this.structures
-        .cell
-        .attr("transform", this.invariables.cellTransform)
-  }
+  // MAIN PARTS DRAWING METHODS
 
   drawMembrane() {
     const points = this.randomCirclePointsGenerator(this.invariables.membranePointNumber, this.variables.r)
@@ -94,20 +100,53 @@ export class Yeast {
                                    .append("path")
                                    .attr("d", this.invariables.radialLineGenerator(points))
                                    .attr("fill", this.variables.color)
-                                   .attr("class", "yeast--mother yeast--breathing yeast--" + this.variables.title)
-    this.breathe()
   }
 
-  breathe() {
-    const radius = this.state.huge ? this.variables.r * this.invariables.hugeMultiplier : this.variables.r
-    const points = this.randomCirclePointsGenerator(this.invariables.membranePointNumber, radius)
-    this.structures
-        .membrane
-        .transition()
-        .duration(1000 + Math.random() * 1000)
-        .ease(d3.easeQuadInOut)
-        .attr("d", this.invariables.radialLineGenerator(points))
-        .on("end", () => {this.breathe()})
+  drawOrganelles() {
+    this.structures.organelles = this.structures
+                                     .cell
+                                     .append("g")
+                                     .style("opacity", 0.1)
+    this.drawNucleus()
+    this.drawMitochondria()
+    this.drawGolgi()
+    this.drawDna()
+  }
+
+  drawText() {
+    this.text.textualParts = this.structures
+                                 .cell
+                                 .append("g")
+                                 .style("opacity",0)
+
+    this.text.title = this.text
+                          .textualParts
+                          .append("text")
+                          .attr("transform", this.setTranslate(0, -this.variables.r/3))
+                          .attr("text-anchor", "middle")
+                          .attr("font-size", this.variables.r * 0.22 + "px")
+                          .attr("font-weight", "bold")
+                          .text(this.variables.title)
+
+    this.text.header = this.text
+                           .textualParts
+                           .append("text")
+                           .attr("text-anchor", "middle")
+                           .attr("font-size", this.variables.r * 0.15 + "px")
+                           .text(this.variables.header)
+
+    this.text.descriptionText = this.text
+                                    .textualParts
+                                    .append("text")
+                                    .attr("transform", this.setTranslate(0, this.variables.r/3))
+                                    .attr("text-anchor", "middle")
+                                    .attr("font-size", this.variables.r * 0.18 + "px")
+                                    .style('opacity', 1)
+                                    .text(this.variables.descriptionArray[0])
+                                    .attr("data-idx", 0)
+
+    this.showGroup(this.text.textualParts, 800, 1)
+    this.cycleDescription()
   }
 
   drawGems() {
@@ -130,7 +169,7 @@ export class Yeast {
         .append("a")
         .attr("xlink:href", this.variables.gitUrl)
         .attr("target", "_blank")
-        .attr("transform", "translate(-" + ((imgWidth / 2) + (this.variables.r * this.invariables.hugeMultiplier / 3)) + " " + (this.variables.r * this.invariables.hugeMultiplier / 3) + ")")
+        .attr("transform", this.setTranslate(-((imgWidth / 2) + (this.invariables.hugeR / 3)), (this.invariables.hugeR / 3)))
         .append("svg:image")
         .attr('width', imgWidth)
         .attr('height', imgHeight)
@@ -144,7 +183,7 @@ export class Yeast {
         .append("a")
         .attr("xlink:href", this.variables.urlUrl)
         .attr("target", "_blank")
-        .attr("transform", "translate(" + (this.variables.r * this.invariables.hugeMultiplier / 3) + " " + (this.variables.r * this.invariables.hugeMultiplier / 3) + ")")
+        .attr("transform", this.setTranslate(((-imgWidth / 2) + (this.invariables.hugeR / 3)), (this.invariables.hugeR / 3)))
         .append("svg:image")
         .attr('width', imgWidth)
         .attr('height', imgHeight)
@@ -154,48 +193,143 @@ export class Yeast {
         })
   }
 
-  addText() {
-    this.text.textualParts = this.structures
-                                 .cell
-                                 .append("g")
-                                 .style("opacity",0)
+  // SECONDARY DRAWING METHODS
 
-    this.text.title = this.text
-                          .textualParts
-                          .append("text")
-                          .attr("class", "yeast--title yeast--transparent yeast--" + this.variables.title)
-                          .attr("id", "yeast--" + this.variables.title)
-                          .attr("transform", "translate(0 -" + this.variables.r/3 + ")")
-                          .attr("text-anchor", "middle")
-                          .attr("font-size", this.variables.r * 0.22 + "px")
-                          .attr("font-weight", "bold")
-                          .text(this.variables.title)
+  drawNucleus() {
+    const signs = this.invariables.organellePositionsArray[0]
+    const nucleusPoints = this.randomCirclePointsGenerator(this.invariables.organellePointNumber, this.variables.r * 0.3)
+    const nucleulusPoints = this.randomCirclePointsGenerator(this.invariables.organellePointNumber, this.variables.r * 0.1)
+    const x = signs[0] + (this.variables.r * (0.3 + 0.2 * Math.random()))
+    const y = signs[1] + (this.variables.r * (0.3 + 0.2 * Math.random()))
+    this.structures.nucleus = this.structures
+                                  .organelles
+                                  .append("g")
+                                  .attr("transform", this.setTranslate(x,y))
 
-    this.text.header = this.text
-                           .textualParts
-                           .append("text")
-                           .attr("text-anchor", "middle")
-                           .attr("font-size", this.variables.r * 0.15 + "px")
-                           .text(this.variables.header)
+    this.structures
+        .nucleus
+        .append("path")
+        .attr("d", this.invariables.radialLineGenerator(nucleusPoints))
+        .attr("fill", "url(#nucleusRadialGradient)")
 
-    this.text.descriptionText = this.text
-                                    .textualParts
-                                    .append("text")
-                                    .attr("class", "yeast--description")
-                                    .attr("transform", "translate(0 " + this.variables.r/3 + ")")
-                                    .attr("text-anchor", "middle")
-                                    .attr("font-size", this.variables.r * 0.18 + "px")
-                                    .style('opacity', 1)
-                                    .text(this.variables.descriptionArray[0])
-                                    .attr("idx", 0)
-    this.showGroup(this.text.textualParts, 800, 1)
-    this.cycleDescription()
+    const nucleusTranslate = {
+      x: Math.random() > 0.5 ? this.variables.r * Math.random() : -this.variables.r * Math.random(),
+      y: Math.random() > 0.5 ? this.variables.r * Math.random() : -this.variables.r * Math.random(),
+    }
+
+    this.structures
+        .nucleus
+        .append("path")
+        .attr("d", this.invariables.radialLineGenerator(nucleulusPoints))
+        .attr("fill", "#ff664c")
+        .attr("transform", this.setTranslate((0.2 * nucleusTranslate.x), (0.2 * nucleusTranslate.y)))
+  }
+
+  drawMitochondria() {
+    const signsArray = this.invariables.organellePositionsArray.slice(1,3)
+    signsArray.map( (signs) => {
+      const rotation = Math.random()
+      const mitocondriaPoints = this.randomEllipsePointsGenerator(this.invariables.organellePointNumber, this.variables.r * 0.2, rotation)
+      const wormPoints = this.randomWormPointsGenerator(this.invariables.organellePointNumber, this.variables.r * 0.2, rotation)
+      const x = signs[0] + (this.variables.r * (0.3 + 0.2 * Math.random()))
+      const y = signs[1] + (this.variables.r * (0.3 + 0.2 * Math.random()))
+      const mitochondria = this.structures
+                               .organelles
+                               .append("g")
+                               .attr("transform", this.setTranslate(x,y))
+
+      mitochondria.append("path")
+                  .attr("d", this.invariables.radialLineGenerator(mitocondriaPoints))
+                  .attr("fill", "#abab9a")
+
+      mitochondria.append("path")
+                  .attr("d", this.invariables.radialLineGenerator(wormPoints))
+                  .attr("fill", "#F5F5DC")
+    })
+  }
+
+  drawGolgi() {
+    const signs = this.invariables.organellePositionsArray[3]
+    const x = signs[0] + (this.variables.r * (0.3 + 0.2 * Math.random()))
+    const y = signs[1] + (this.variables.r * (0.3 + 0.2 * Math.random()))
+    const golgi = this.structures
+                      .organelles
+                      .append("g")
+                      .attr("transform", this.setTranslate(x,y))
+    golgi.append("path")
+         .attr("d", "m10,0 s10,10 20,-5 m-30,3 s15,15 30,0 m-30,3 s10,10 20,5 m-20,0 s10,10 35,-3")
+         .attr("stroke", "black")
+         .attr("stroke-width", "2px")
+         .attr("fill", "transparent")
+         .attr("transform", "rotate(" + Math.random() * 180 + ")")
+  }
+
+  drawDna() {
+    this.structures.dna = this.structures
+                              .cell
+                              .append("g")
+                              .style("opacity", 0)
+                              .attr("display", "none")
+                              .attr("transform", this.setTranslate(0, -this.invariables.hugeR / 2))
+
+    const ploidy = Object.keys(this.variables.genome).length
+    const total = Object.values(this.variables.genome).reduce((a, b) => a + b, 0)
+
+    Object.keys(this.variables.genome).map( (gene, idx) => {
+      this.drawChromosome(gene, idx, ploidy, total)
+    })
+  }
+
+  drawChromosome(gene, idx, ploidy, total) {
+    const value = this.variables.genome[gene]
+    const height =  0.1 * this.invariables.hugeR * Math.log(value) / Math.log(total)
+    const part = idx / (ploidy - 1)
+    const ratio = value / total
+    const position = {
+      x: -this.invariables.hugeR / 2 + this.invariables.hugeR * part,
+      y: 0
+    }
+    const chromosome = this.structures.dna.append("g")
+    chromosome.attr("fill", this.chromosomeColor(gene))
+
+    const data = d3.range(0, 2 * Math.PI, .1)
+                   .map(function(t) {
+                      return {
+                        angle: t + Math.PI * 0.5,
+                        r: height * (Math.sin(4 * t) - 2 * Math.sin(2 * t))
+                      }
+                   })
+
+    chromosome.append("path")
+              .attr("class", "line")
+              .attr("d", this.invariables.radialLineGenerator(data))
+              .attr("transform", this.setTranslate(position.x, position.y))
+
+    chromosome.append("text")
+              .attr("transform", this.setTranslate((position.x - this.invariables.hugeR / 12), (position.y + this.invariables.hugeR / 3)))
+              .text(Math.round(ratio * 1000)/10 + "%")
+              .attr("fill", "black")
+              .attr("font-size", this.invariables.hugeR / 12 + "px")
+  }
+
+  // ACTION METHODS
+
+  breathe() {
+    const radius = this.state.huge ? this.invariables.hugeR : this.variables.r
+    const points = this.randomCirclePointsGenerator(this.invariables.membranePointNumber, radius)
+    this.structures
+        .membrane
+        .transition()
+        .duration(1000 + Math.random() * 1000)
+        .ease(d3.easeQuadInOut)
+        .attr("d", this.invariables.radialLineGenerator(points))
+        .on("end", () => {this.breathe()})
   }
 
   cycleDescription() {
     const max = this.variables.descriptionArray.length - 1
     let newIndex
-    const currentIndex = parseInt(this.text.descriptionText.attr("idx"))
+    const currentIndex = parseInt(this.text.descriptionText.attr("data-idx"))
     if(currentIndex == max){
       newIndex = 0
     }else{
@@ -211,7 +345,7 @@ export class Yeast {
             this.text
                 .descriptionText
                 .text(this.variables.descriptionArray[newIndex])
-                .attr("idx", newIndex)
+                .attr("data-idx", newIndex)
             this.text
                 .descriptionText
                 .transition()
@@ -252,30 +386,30 @@ export class Yeast {
 
   center(callback) {
     this.removeOthers()
-    this.invariables.cellTransform.x = this.variables.w / 2
-    this.invariables.cellTransform.y = this.variables.h / 2
+    const x = this.variables.w / 2
+    const y = this.variables.h / 2
     this.structures
         .cell
         .transition()
         .duration(1000)
-        .attr("transform", this.invariables.cellTransform)
+        .attr("transform", this.setTranslate(x,y))
         .on("end", () => callback() )
   }
 
   goBack() {
     this.showOthers()
-    this.invariables.cellTransform.x = this.variables.x
-    this.invariables.cellTransform.y = this.variables.y
+    const x = this.variables.x
+    const y = this.variables.y
     this.structures
         .cell
         .transition()
         .duration(1000)
-        .attr("transform", this.invariables.cellTransform)
+        .attr("transform", this.setTranslate(x,y))
   }
 
   embiggen() {
     this.state.huge = true
-    const newPoints = this.randomCirclePointsGenerator(this.invariables.membranePointNumber, this.variables.r * this.invariables.hugeMultiplier)
+    const newPoints = this.randomCirclePointsGenerator(this.invariables.membranePointNumber, this.invariables.hugeR)
     this.structures
         .membrane
         .transition()
@@ -324,12 +458,12 @@ export class Yeast {
     })
   }
 
-  hide() {
-    this.hideGroup(this.structures.cell, 1400, 0)
+  hide(opacity = 0, time = 1400) {
+    this.hideGroup(this.structures.cell, time, opacity)
   }
 
-  show() {
-    this.showGroup(this.structures.cell, 600, 1)
+  show(opacity = 1, time = 600) {
+    this.showGroup(this.structures.cell, time, opacity)
     this.breathe()
   }
 
@@ -359,7 +493,7 @@ export class Yeast {
         .attr("d", this.invariables.radialLineGenerator(nucleusPoints))
         .attr("fill", "url(#nucleusRadialGradient)")
 
-    const nucleusTranslate = {
+    const nucleusTranslate = {
       x: Math.random() > 0.5 ? this.variables.r * Math.random() : -this.variables.r * Math.random(),
       y: Math.random() > 0.5 ? this.variables.r * Math.random() : -this.variables.r * Math.random(),
     }
@@ -372,87 +506,20 @@ export class Yeast {
         .attr("transform", "translate(" + (0.2 * nucleusTranslate.x) + " " + (0.2 * nucleusTranslate.y) + ")")
   }
 
-  drawMitochondria() {
-    const signsArray = this.invariables.organellePositionsArray.slice(1,3)
-    signsArray.map( (signs) => {
-      const rotation = Math.random()
-      const mitocondriaPoints = this.randomEllipsePointsGenerator(this.invariables.organellePointNumber, this.variables.r * 0.2, rotation)
-      const wormPoints = this.randomWormPointsGenerator(this.invariables.organellePointNumber, this.variables.r * 0.2, rotation)
-      const mitochondria = this.structures
-                               .organelles
-                               .append("g")
-                               .attr("transform", "translate(" + signs[0] + (this.variables.r * (0.3 + 0.2 * Math.random())) + " " + signs[1] + (this.variables.r * (0.3 + 0.2 * Math.random())) + ")")
+  // INTERACTION METHODS
 
-      mitochondria.append("path")
-                  .attr("d", this.invariables.radialLineGenerator(mitocondriaPoints))
-                  .attr("fill", "#abab9a")
-
-      mitochondria.append("path")
-                  .attr("d", this.invariables.radialLineGenerator(wormPoints))
-                  .attr("fill", "#F5F5DC")
-    })
-  }
-
-  drawGolgi() {
-    const signs = this.invariables.organellePositionsArray[3]
-    const golgi = this.structures
-                      .organelles
-                      .append("g")
-                      .attr("transform", "translate(" + signs[0] + (this.variables.r * (0.3 + 0.2 * Math.random())) + " " + signs[1] + (this.variables.r * (0.3 + 0.2 * Math.random())) + ")")
-    golgi.append("path")
-         .attr("d", "m10,0 s10,10 20,-5 m-30,3 s15,15 30,0 m-30,3 s10,10 20,5 m-20,0 s10,10 35,-3")
-         .attr("stroke", "black")
-         .attr("stroke-width", "2px")
-         .attr("fill", "transparent")
-         .attr("transform", "rotate(" + Math.random() * 180 + ")")
-  }
-
-  drawDna() {
-    this.structures.dna = this.structures
-                              .cell
-                              .append("g")
-                              .style("opacity", 0)
-                              .attr("display", "none")
-                              .attr("transform", "translate(0,-" + this.variables.r * this.invariables.hugeMultiplier / 2 + ")")
-
-    const ploidy = Object.keys(this.variables.genome).length
-    const total = Object.values(this.variables.genome).reduce((a, b) => a + b, 0)
-
-    Object.keys(this.variables.genome).map( (gene, idx) => {
-      this.drawChromosome(gene, idx, ploidy, total)
-    })
-  }
-
-  drawChromosome(gene, idx, ploidy, total) {
-    const value = this.variables.genome[gene]
-    const height =  0.1 * this.variables.r * this.invariables.hugeMultiplier * Math.log(value) / Math.log(total)
-    const part = idx / (ploidy - 1)
-    const ratio = value / total
-    const position = {
-      x: -this.variables.r * this.invariables.hugeMultiplier / 2 + this.variables.r * this.invariables.hugeMultiplier * part,
-      y: 0
+  onCellHover() {
+    if(!this.state.huge){
+      this.showGroup(this.text.textualParts, 300, 0.1)
+      this.showGroup(this.structures.organelles, 300, 1)
     }
-    const chromosome = this.structures.dna.append("g")
-    chromosome.attr("fill", this.chromosomeColor(gene))
+  }
 
-    const data = d3.range(0, 2 * Math.PI, .1)
-                   .map(function(t) {
-                      return {
-                        angle: t + Math.PI * 0.5,
-                        r: height * (Math.sin(4 * t) - 2 * Math.sin(2 * t))
-                      }
-                   })
-
-    chromosome.append("path")
-              .attr("class", "line")
-              .attr("d", this.invariables.radialLineGenerator(data))
-              .attr("transform", "translate(" + position.x + " " + position.y + ")")
-
-    chromosome.append("text")
-              .attr("transform", "translate(" + (position.x - this.variables.r * this.invariables.hugeMultiplier / 12) + " " + (position.y + this.variables.r * this.invariables.hugeMultiplier / 3) + ")")
-              .text(Math.round(ratio * 1000)/10 + "%")
-              .attr("fill", "black")
-              .attr("font-size", this.variables.r * this.invariables.hugeMultiplier / 12 + "px")
+  onCellOut() {
+    if(!this.state.huge){
+      this.showGroup(this.structures.organelles, 300, 0.1)
+      this.showGroup(this.text.textualParts, 300, 1)
+    }
   }
 
   chromosomeColor(language) {
@@ -568,7 +635,7 @@ export class Yeast {
   }
 
   goCrazy(){
-    const radius = this.state.huge ? this.variables.r * this.invariables.hugeMultiplier : this.variables.r
+    const radius = this.state.huge ? this.invariables.hugeR : this.variables.r
     const points = this.randomCirclePointsGenerator(this.invariables.membranePointNumber, radius, 1.5)
     this.structures
         .membrane
@@ -580,7 +647,7 @@ export class Yeast {
   }
 
   calmDown(){
-    const radius = this.state.huge ? this.variables.r * this.invariables.hugeMultiplier : this.variables.r
+    const radius = this.state.huge ? this.invariables.hugeR : this.variables.r
     const points = this.randomCirclePointsGenerator(this.invariables.membranePointNumber, radius)
     this.structures
         .membrane
@@ -596,4 +663,44 @@ export class Yeast {
         })
   }
 
+  onCellStartDrag(){
+    this.structures.cell.raise()
+    Object.keys(this.invariables.population).map( (yeastName) => {
+      if(yeastName != this.variables.title && this.invariables.population[yeastName].variables.draggable){
+        this.invariables.population[yeastName].show(0.5, 200)
+      }
+    })
+  }
+
+  onCellDrag(){
+    if(!this.state.huge){
+      this.structures
+          .cell
+          .attr("transform", this.setTranslate(d3.event.x, d3.event.y))
+    }
+  }
+
+  onCellEndDrag(){
+    Object.keys(this.invariables.population).map( (yeastName) => {
+      if(yeastName != this.variables.title && this.invariables.population[yeastName].variables.draggable){
+        this.invariables.population[yeastName].show()
+      }
+    })
+    if(this.insideDish(d3.event.x, d3.event.y)){
+      this.onCellClick()
+    }else{
+      this.goBack()
+    }
+  }
+
+  insideDish(x,y){
+    const pdX = this.variables.petriDish.dish.attr("cx")
+    const pdY = this.variables.petriDish.dish.attr("cy")
+    const dist = Math.sqrt((pdX - x) ** 2 + (pdY - y) ** 2)
+    return dist < this.variables.r
+  }
+
+  setTranslate(x,y){
+    return "translate(" + x  + "," + y + ")"
+  }
 }

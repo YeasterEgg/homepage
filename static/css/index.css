@@ -5,6 +5,50 @@ body{
   padding: 0;
 }
 
+svg{
+  background-image: radial-gradient(#eef2f3 0%, #8e9eab 100%);
+}
+
 .yeast--container{
   cursor: pointer;
+}
+
+.slider{
+  text-align: center;
+  display: inline-block;
+}
+
+.slider label, .slider input{
+  display: block;
+  width: 100%;
+}
+
+#sliders{
+  position: absolute;
+  height: 175px;
+  padding-right: 50px;
+  background-image: radial-gradient(#eef2f3 0%, #8e9eab 100%);
+}
+
+#info_menu{
+  background-image: radial-gradient(#8e9eab 0%, #eef2f3 100%);
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  z-index: 10;
+  padding: 40px;
+  border-radius: 10px;
+}
+
+#hamburg_menu{
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  font-size: 20px;
+  height: 50px;
+  width: 50px;
+  z-index: 10;
 }
