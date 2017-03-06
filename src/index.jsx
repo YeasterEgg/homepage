@@ -1,6 +1,7 @@
 const modules = {
   yeast: require ('./yeasts.jsx'),
-  gravity: require ('./gravity.jsx')
+  gravity: require ('./gravity.jsx'),
+  chaos: require ('./chaos.jsx')
 }
 
 const startAnimation = () => {

@@ -5,7 +5,7 @@ from random import randint
 from itertools import repeat
 from io import BytesIO
 from dotenv import load_dotenv
-from os.path import dirname, join
+from os.path import dirname, join, isfile
 from os import getenv
 from git_reader import update_json
 
@@ -32,9 +32,10 @@ def home():
   visited_website("Homepage")
   return render_template('index.html')
 
-@app.route("/gravity", methods=["GET"])
-def gravity():
-  return render_template('gravity.html')
+@app.route("/<template>", methods=["GET"])
+def template(template):
+  template_file = '{}.html'.format(template)
+  return render_template(template_file)
 
 @app.route("/visited_website", methods=["GET"])
 def visited():
