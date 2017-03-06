@@ -2,23 +2,30 @@ const d3 = require('d3')
 
 export class Particle {
   constructor(data) {
+    // INSTANCE VARIABLES
     this.id = data.id
     this.r  = data.r
+    this.x = data.x
+    this.y = data.y
+
+    // CLASS VARIABLES
     this.sw = data.sw
+    this.color = data.color
+    this.classId = data.classId
+
+    // WORLD VARIABLES
     this.w  = data.w
     this.h  = data.h
     this.M  = data.M
     this.at = data.at
+    this.distMin = data.distMin
+    this.distMax = data.distMax
 
-    this.x = data.x
-    this.y = data.y
-
+    // STANDARD VARIABLES
     this.xv = 0
     this.yv = 0
-    this.color = data.color || "black"
-    this.classId = data.classId
-
-    this.charge = 1
+    this.group = null
+    this.particle = null
   }
 
   put(svg) {
@@ -29,10 +36,11 @@ export class Particle {
                         .attr("cx", this.x)
                         .attr("cy", this.y)
                         .attr("fill", "transparent")
+                        .attr("id", this.id)
                         .attr("stroke", this.color)
                         .attr("stroke-width", this.sw)
-
-    this.group.on("click", () => {this.onClick()})
+    this.group
+        .on("click", () => {this.onClick()})
   }
 
   onClick() {
@@ -40,21 +48,23 @@ export class Particle {
     this.yv = 0
   }
 
-  updateStatus(centre, sameArray) {
-    this.checkCentre(centre)
+  updateAndMove(particles, centroid, matrix, world) {
+    this.updateWorld(world)
     this.checkBorders()
+    this.checkInteractions(particles, matrix)
     this.addAttrition()
-    // this.checkOthers(sameArray)
     this.move()
   }
 
-  checkCentre(centre) {
-    const dx = centre.x - this.x
-    const dy = centre.y - this.y
-    const dist = Math.sqrt( dx ** 2 + dy ** 2 )
-    const angle = Math.atan2(dy, dx)
-    this.xv +=  (Math.cos(angle) * this.M) / (this.r * dist)
-    this.yv +=  (Math.sin(angle) * this.M) / (this.r * dist)
+  updateWorld(world) {
+    this.w  = world.w
+    this.h  = world.h
+    this.M  = world.M
+    this.at = world.attrition
+    this.distMin = world.distMin
+    this.distMax = world.distMax
+    this.r  = world.particleRadius
+    this.sw = world.strokeWidth
   }
 
   checkBorders() {
@@ -75,14 +85,25 @@ export class Particle {
     }
   }
 
-  checkOthers(sameArray) {
-    sameArray.map( (particle) => {
-      const dx = particle.x - this.x
-      const dy = particle.y - this.y
-      const dist = Math.sqrt( dx ** 2 + dy ** 2 )
-      const angle = Math.atan2(dy, dx)
-      this.xv +=  (Math.cos(angle) * this.M) / (this.r * dist)
-      this.yv +=  (Math.sin(angle) * this.M) / (this.r * dist)
+  checkInteractions(particles, matrix) {
+    particles.map( (particle) => {
+      if(particle != this){
+        const dx = particle.x - this.x
+        const dy = particle.y - this.y
+        const dist = Math.sqrt( dx ** 2 + dy ** 2 )
+        if(dist < this.distMax && dist > this.distMin){
+          const angle = Math.atan2(dy, dx)
+          const coeff = matrix[this.classId][particle.classId]
+          this.xv +=  coeff * (Math.cos(angle) * this.M) / (this.r * dist)
+          this.yv +=  coeff * (Math.sin(angle) * this.M) / (this.r * dist)
+          // if(dist < this.r + particle.r){
+          //   this.x -= this.x < particle.x ? (dist - dx) : -(dist - dx)
+          //   this.y -= this.y < particle.y ? (dist - dy) : -(dist - dy)
+          //   this.xv += -2 * this.xv
+          //   this.yv += -2 * this.yv
+          // }
+        }
+      }
     })
   }
 

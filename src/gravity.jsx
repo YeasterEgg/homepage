@@ -1,21 +1,55 @@
 const d3 = require('d3')
+const sliders = require("./gravity/sliders.jsx")
 const Particle = require("./gravity/particle.jsx").Particle
 const Centroid = require("./gravity/centroid.jsx").Centroid
+const padding = 175
 
-const w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
-const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
-const particleRadius = 6
-const centroidRadius = 2
-const attrition = 0.95
+const colorList = [
+  "blue",
+  "red",
+  "green",
+  "black",
+  "yellow",
+  "grey"
+]
 
-const M = 10
+let world = {
+  w: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
+  h: Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - padding,
+  particleRadius: 2,
+  centroidRadius: 2,
+  strokeWidth: 5,
+  emptySpace: 20,
+  attrition: 0.9,
+  distMin: 0,
+  distMax: 200,
+  M: 10
+}
 
-const times = (n,callback) => {
-  const m = n
-  while(n > 0){
-    callback(m - n)
-    n--
-  }
+let particleClasses = colorList.map((color) => { return {color: color} })
+
+let classesMatrix = particleClasses.map( (color, idx) => {
+  return particleClasses.map(() => {
+    return -1
+  })
+})
+
+console.log(classesMatrix)
+
+export const startAnimation = () => {
+  sliders.drawSliders("#hamburg_menu", "#sliders", "#info_menu", particleClasses, classesMatrix)
+  const container = d3.select("body")
+                      .append("svg")
+                      .attr("width", world.w+"px")
+                      .attr("height", world.h+"px")
+                      .style("position", "absolute")
+                      .style("top", padding + "px")
+
+  const svg = container.append("g")
+  const particles = addParticles(svg)
+  const centroid = new Centroid(world.centroidRadius)
+  centroid.put(svg)
+  checkGravity(particles, centroid)
 }
 
 const particleHash = (id, x, y, color, classId) => {
@@ -23,62 +57,33 @@ const particleHash = (id, x, y, color, classId) => {
     id: id,
     x: x,
     y: y,
-    w: w,
-    h: h,
-    r: particleRadius,
-    M: M,
-    at: attrition,
-    sw: 5,
     color: color,
-    classId: classId
+    classId: classId,
+    w: world.w,
+    h: world.h,
+    r: world.particleRadius,
+    M: world.M,
+    at: world.attrition,
+    sw: world.strokeWidth,
+    distMax: world.distMax,
+    distMin: world.distMin
   }
 }
 
-const particleClasses = [
-  {color: "red"},
-  {color: "blue"},
-  {color: "green"}
-]
-
-const classesMatrix = [
-  [(0.5 - Math.random()) * 2, (0.5 - Math.random()) * 2, (0.5 - Math.random()) * 2],
-  [(0.5 - Math.random()) * 2, (0.5 - Math.random()) * 2, (0.5 - Math.random()) * 2],
-  [(0.5 - Math.random()) * 2, (0.5 - Math.random()) * 2, (0.5 - Math.random()) * 2]
-]
-
-export const startAnimation = () => {
-  const container = d3.select("body")
-                      .append("svg")
-                      .attr("width", w+"px")
-                      .attr("height", h+"px")
-  const svg = container.append("g")
-  const particles = [
-    [],[],[]
-  ]
-  const centroids = []
-  addParticles(svg, particles)
-  particles.map( (particleClass) => {
-    const centroid = new Centroid(centroidRadius)
-    centroid.put(svg)
-    centroids.push(centroid)
-  })
-  window.requestAnimationFrame( () => {
-    checkGravity(centroids, particles)
-  })
-}
-
-const addParticles = (svg, particles) => {
-  const gridHorLength = Math.round(w / (particleRadius * 20))
-  const gridVerLength = Math.round(h / (particleRadius * 20))
-  const gridHorSize = w / gridHorLength
-  const gridVerSize = h / gridVerLength
+const addParticles = (svg) => {
+  const particles = []
+  const gridHorLength = Math.round(world.w / (world.particleRadius * world.emptySpace))
+  const gridVerLength = Math.round(world.h / (world.particleRadius * world.emptySpace))
+  const gridHorSize = world.w / gridHorLength
+  const gridVerSize = world.h / gridVerLength
   times(gridHorLength, (horIdx) => {
     times(gridVerLength, (verIdx) => {
       const particle = randomClassParticle(gridHorSize, gridVerSize, horIdx, verIdx)
       particle.put(svg)
-      particles[particle.classId].push(particle)
+      particles.push(particle)
     })
   })
+  return particles
 }
 
 const randomClassParticle = (gridHorSize, gridVerSize, horIdx, verIdx) => {
@@ -86,15 +91,21 @@ const randomClassParticle = (gridHorSize, gridVerSize, horIdx, verIdx) => {
   const particleClass = particleClasses[classId]
   const x = gridHorSize * horIdx + gridHorSize / 2 + (Math.random() - 0.5) * gridHorSize
   const y = gridVerSize * verIdx + gridVerSize / 2 + (Math.random() - 0.5) * gridVerSize
-  return new Particle(particleHash(horIdx + "_" + verIdx, x, y, particleClass.color, classId))
+  return new Particle(particleHash("c" + classId + "-" + horIdx + "_" + verIdx, x, y, particleClass.color, classId))
 }
 
-const checkGravity = (centroids, particles) => {
-  particleClasses.map( (particleClass, idx) => {
-    centroids[idx].moveToCentroid(particles[idx])
-    particles[idx].map( (proton) => {
-      proton.updateStatus(centroids[idx], particles[idx])
-    })
+const checkGravity = (particles, centroid) => {
+  centroid.moveToCentroid(particles)
+  particles.map((particle) => {
+    particle.updateAndMove(particles, centroid, classesMatrix, world)
   })
-  window.requestAnimationFrame( () => {checkGravity(centroids, particles)})
+  window.requestAnimationFrame( () => {checkGravity(particles, centroid)})
+}
+
+const times = (n,callback) => {
+  const m = n
+  while(n > 0){
+    callback(m - n)
+    n--
+  }
 }
