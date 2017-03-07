@@ -9,16 +9,16 @@ const addSliders = (slidersSelect, particleClasses, classesMatrix, w) => {
   const slidersContainer = d3.select(slidersSelect)
   particleClasses.map( (particleClass1, idx1) => {
     const row = slidersContainer.append("div")
-                                .attr("class", "slider_row")
+                                .attr("class", "gravity-slider_row")
     particleClasses.map( (particleClass2, idx2) => {
-      const width = Math.floor((w - 70) / particleClasses.length) + "px"
+      const width = Math.floor((w - 70) / particleClasses.length) * 0.5 + "px"
 
       const div = row.append("div")
                      .style("display", "inline-block")
                      .attr("width", width)
 
       const slider = div.append("input")
-                        .attr("class", "slider")
+                        .attr("class", "gravity-slider")
                         .attr("type", "range")
                         .attr("min", "-1")
                         .attr("max", "1")
