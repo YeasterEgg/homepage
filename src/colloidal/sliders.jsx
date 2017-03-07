@@ -1,12 +1,12 @@
 const d3 = require('d3')
 
-export const drawSliders = (menuSelect, slidersSelect, infoMenu, particleClasses, classesMatrix, w) => {
-  addSliders(slidersSelect, particleClasses, classesMatrix, w)
-  menuListener(infoMenu)
+export const drawSliders = (particleClasses, classesMatrix, w) => {
+  addSliders(particleClasses, classesMatrix, w)
+  menuListener()
 }
 
-const addSliders = (slidersSelect, particleClasses, classesMatrix, w) => {
-  const slidersContainer = d3.select(slidersSelect)
+const addSliders = (particleClasses, classesMatrix, w) => {
+  const slidersContainer = d3.select(".sliders_container")
   particleClasses.map( (particleClass1, idx1) => {
     const row = slidersContainer.append("div")
                                 .attr("class", "gravity-slider_row")
@@ -41,14 +41,14 @@ const onChange = (slider, idx1, idx2, classesMatrix) => {
   classesMatrix[idx1][idx2] = slider.property("value")
 }
 
-const menuListener = (infoMenu) => {
+const menuListener = () => {
   let menuVisible = false
-  d3.select(hamburg_menu).on("click", () => {
+  d3.select("#hamburg_menu").on("click", () => {
     if(menuVisible){
-      d3.select(infoMenu)
+      d3.select("#info_menu")
         .style("display", "none")
     }else{
-      d3.select(infoMenu)
+      d3.select("#info_menu")
         .style("display", "block")
     }
     menuVisible = !menuVisible

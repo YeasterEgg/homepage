@@ -34,9 +34,8 @@ def home():
 
 @app.route("/<template>", methods=["GET"])
 def template(template):
-  size = request.args.get("size") or 6
   template_file = '{}.html'.format(template)
-  return render_template(template_file, size = size)
+  return render_template(template_file)
 
 @app.route("/visited_website", methods=["GET"])
 def visited():

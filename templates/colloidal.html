@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="">
   <head>
-    <title>YeasterEgg!</title>
+    <title>YeasterEgg fun with colloidal Mixtures!</title>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,18 +12,21 @@
     <link rel="icon" type="image/png" href="/favicon" />
   </head>
   <body id="colloidal">
-    <div id="colloidal-header">
-      <div id="colloidal-slider_container"></div>
-      <div id="colloidal-choices">
-        <label for="colloidal-size_input">Number of colors</label>
-        <input id="colloidal-size_input" type="number" max="6" min="1" value="3" step="1" maxlength="1"/>
-        <label for="colloidal-attrition_input">Attrition</label>
-        <input id="colloidal-attrition_input" type="number" max="1" min="0" value="0.9" step="0.01" maxlength="3"/>
+    <div class="header">
+      <div class="sliders_container"></div>
+      <div class="inputs">
+        <label for="size_input">Number of classes</label>
+        <input id="size_input" type="number" max="6" min="1" value="3" step="1" maxlength="1"/>
+        <label for="attrition_input">Movement Attrition</label>
+        <input id="attrition_input" type="number" max="1" min="0" value="0.9" step="0.01" maxlength="3"/>
+        <label for="m_input">Interaction Coefficient</label>
+        <input id="m_input" type="number" max="1" min="0" value="0.9" step="0.01" maxlength="3"/>
+        <label for="minimum_input">Interaction Minimum Distance</label>
+        <input id="minimum_input" type="number" max="1" min="0" value="0.9" step="0.01" maxlength="3"/>
       </div>
       <img id="hamburg_menu" src="/static/pics/hamburg.png"></img>
     </div>
-    <canvas id="colloidal-canvas"></canvas>
-    <div id="colloidal-info_menu">No info here, just an Hamburg Menu</div>
+    <div id="info_menu">No info here, just an Hamburg Menu</div>
     <script src="{{url_for('static', filename='bundle.js')}}"></script>
   </body>
 </html>

@@ -1,7 +1,7 @@
 const modules = {
   yeast: require ('./yeasts.jsx'),
-  gravity: require ('./gravity.jsx'),
   colloidal: require ('./colloidal.jsx'),
+  canvas: require ('./canvas.jsx'),
 }
 
 const startAnimation = () => {

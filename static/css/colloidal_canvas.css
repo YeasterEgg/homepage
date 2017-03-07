@@ -9,13 +9,13 @@ svg{
   background-image: radial-gradient(#eef2f3 0%, #8e9eab 100%);
 }
 
-#slider_container{
+#colloidal-slider_container{
   width: 50%;
   padding-left: 10%;
   display: inline-block;
 }
 
-#choices{
+#colloidal-choices{
   display: inline-block;
   width: 30%;
   z-index: 10;
@@ -26,17 +26,17 @@ svg{
   margin: auto;
 }
 
-.slider{
+.colloidal-slider{
   text-align: center;
   display: inline-block;
 }
 
-.slider label, .slider input{
+.colloidal-slider label, .colloidal-slider input{
   display: block;
   width: 100%;
 }
 
-#header{
+#colloidal-header{
   position: absolute;
   height: 175px;
   background-image: radial-gradient(#eef2f3 0%, #8e9eab 100%);
@@ -45,7 +45,7 @@ svg{
   width: 100%;
 }
 
-#info_menu{
+#colloidal-info_menu{
   background-image: radial-gradient(#8e9eab 0%, #eef2f3 100%);
   display: none;
   position: absolute;
@@ -68,16 +68,21 @@ svg{
   z-index: 10;
 }
 
-#size_choice{
+#colloidal-size_choice{
   font-size: 20px;
   height: 35px;
   width: 40px;
   text-align: center;
 }
 
-#attrition_choice{
+#colloidal-attrition_choice{
   font-size: 20px;
   height: 35px;
   width: 60px;
   text-align: center;
+}
+
+#colloidal-canvas{
+  position: absolute;
+  top: 175px;
 }
