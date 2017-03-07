@@ -1,7 +1,6 @@
 const d3 = require('d3')
 const sliders = require("./gravity/sliders.jsx")
 const Particle = require("./gravity/particle.jsx").Particle
-const Centroid = require("./gravity/centroid.jsx").Centroid
 const padding = 175
 document.workingAnimationFrames = {}
 
@@ -20,7 +19,6 @@ let world = {
   w: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
   h: Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - padding,
   particleRadius: 2,
-  centroidRadius: 2,
   strokeWidth: 5,
   emptySpace: 30,
   attrition: 0.8,
@@ -58,10 +56,8 @@ const startNewAnimation = (size = 3) => {
                 .style("position", "absolute")
                 .style("top", padding + "px")
   const particles = addParticles(svg, particleClasses)
-  const centroid = new Centroid(world.centroidRadius)
-  centroid.put(svg)
   document.workingAnimationFrames[size] = true
-  window.requestAnimationFrame( () => {checkGravity(particles, centroid, classesMatrix, size)})
+  window.requestAnimationFrame( () => {checkGravity(particles, classesMatrix, size)})
 }
 
 const particleHash = (id, x, y, color, classId) => {
@@ -106,13 +102,12 @@ const randomClassParticle = (gridHorSize, gridVerSize, horIdx, verIdx, particleC
   return new Particle(particleHash("c" + classId + "-" + horIdx + "_" + verIdx, x, y, particleClass.color, classId))
 }
 
-const checkGravity = (particles, centroid, classesMatrix, id) => {
-  centroid.moveToCentroid(particles)
+const checkGravity = (particles, classesMatrix, id) => {
   particles.map((particle) => {
-    particle.updateAndMove(particles, centroid, classesMatrix, world)
+    particle.updateAndMove(particles, classesMatrix, world)
   })
   if(document.workingAnimationFrames[id]){
-    window.requestAnimationFrame( () => {checkGravity(particles, centroid, classesMatrix, id)})
+    window.requestAnimationFrame( () => {checkGravity(particles, classesMatrix, id)})
   }
 }
 
