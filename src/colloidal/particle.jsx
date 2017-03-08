@@ -37,6 +37,7 @@ export class Particle {
     this.checkInteractions(world, particles, matrix)
     this.checkMouse(world, mouseBall)
     this.addAttrition(world)
+    this.addRandomTemperature(world)
     this.move()
   }
 
@@ -69,12 +70,6 @@ export class Particle {
           const coeff = matrix[this.classId][particle.classId]
           this.xv +=  coeff * (Math.cos(angle) * world.M) / (world.particleRadius * dist)
           this.yv +=  coeff * (Math.sin(angle) * world.M) / (world.particleRadius * dist)
-          // if(dist < world.particleRadius + particle.r){
-          //   this.x -= this.x < particle.x ? (dist - dx) : -(dist - dx)
-          //   this.y -= this.y < particle.y ? (dist - dy) : -(dist - dy)
-          //   this.xv += -2 * this.xv
-          //   this.yv += -2 * this.yv
-          // }
         }
       }
     })
@@ -103,6 +98,11 @@ export class Particle {
     this.particle
         .attr("cx", this.x)
         .attr("cy", this.y)
+  }
+
+  addRandomTemperature(world) {
+    this.xv += (0.5 - Math.random()) * world.systemEnergy * 0.1
+    this.yv += (0.5 - Math.random()) * world.systemEnergy * 0.1
   }
 
   getMomentum() {

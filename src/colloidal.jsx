@@ -25,7 +25,8 @@ const world = {
   mouseWeight: 1,
   mouseActive: false,
   mouseXvel: 0,
-  mouseYvel: 0
+  mouseYvel: 0,
+  systemEnergy: 3
 }
 
 export const startAnimation = () => {
@@ -161,6 +162,12 @@ const inputListener = () => {
   interactionMouseWeight.attr("value", world.mouseWeight)
   interactionMouseWeight.on("input", () => {
     world.mouseWeight = parseInt(interactionMouseWeight.property("value"))
+  })
+
+  const interactionSystemEnergy = d3.select("#colloidal-system_energy")
+  interactionSystemEnergy.attr("value", world.systemEnergy)
+  interactionSystemEnergy.on("input", () => {
+    world.systemEnergy = parseInt(interactionSystemEnergy.property("value"))
   })
 }
 

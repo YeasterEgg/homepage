@@ -32,12 +32,11 @@ def home():
   visited_website("Homepage")
   return render_template('index.html')
 
-@app.route("/<template>", methods=["GET"])
-def template(template):
-  template_file = '{}.html'.format(template)
-  text = "We bellezza, qualcuno ha guardato la pagina {template}, micacazzi!".format(template=template)
+@app.route("/colloidal", methods=["GET"])
+def colloidal():
+  text = "We bellezza, qualcuno ha guardato la pagina colloidal, micacazzi!"
   send_to_telegram(text)
-  return render_template(template_file)
+  return render_template("colloidal.html")
 
 @app.route("/visited_website", methods=["GET"])
 def visited():
