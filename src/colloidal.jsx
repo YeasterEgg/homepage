@@ -21,7 +21,12 @@ const world = {
   attrition: 0.95,
   distMin: 5,
   distMax: 200,
-  M: 10
+  M: 10,
+  mouseRadius: 15,
+  mouseWeight: 1,
+  mouseActive: false,
+  mouseXvel: 0,
+  mouseYvel: 0
 }
 
 export const startAnimation = () => {
@@ -53,9 +58,15 @@ const startNewAnimation = (size = 3, emptySpace = 20) => {
                 .style("position", "absolute")
                 .style("top", padding + "px")
   const particles = addParticles(svg, particleClasses, emptySpace)
+  const mouseBall = svg.append("circle")
+                       .attr("r", world.mouseRadius)
+                       .attr("fill", "white")
+                       .attr("id", "mouse_ball")
+                       .style("opacity", 0)
+  mouseListener(svg, mouseBall)
   const id = size + "_" + emptySpace
   document.workingAnimationFrames[id] = true
-  window.requestAnimationFrame( () => {checkGravity(particles, classesMatrix, id)})
+  window.requestAnimationFrame( () => {particlesUpdate(particles, classesMatrix, mouseBall, id)})
 }
 
 const particleHash = (id, x, y, color, classId) => {
@@ -65,14 +76,6 @@ const particleHash = (id, x, y, color, classId) => {
     y: y,
     color: color,
     classId: classId,
-    w: world.w,
-    h: world.h,
-    r: world.particleRadius,
-    M: world.M,
-    at: world.attrition,
-    sw: world.strokeWidth,
-    distMax: world.distMax,
-    distMin: world.distMin
   }
 }
 
@@ -85,7 +88,7 @@ const addParticles = (svg, particleClasses, emptySpace) => {
   times(gridHorLength, (horIdx) => {
     times(gridVerLength, (verIdx) => {
       const particle = randomClassParticle(gridHorSize, gridVerSize, horIdx, verIdx, particleClasses)
-      particle.put(svg)
+      particle.put(svg, world)
       particles.push(particle)
     })
   })
@@ -100,12 +103,12 @@ const randomClassParticle = (gridHorSize, gridVerSize, horIdx, verIdx, particleC
   return new Particle(particleHash("c" + classId + "-" + horIdx + "_" + verIdx, x, y, particleClass.color, classId))
 }
 
-const checkGravity = (particles, classesMatrix, id) => {
+const particlesUpdate = (particles, classesMatrix, mouseBall, id) => {
   particles.map((particle) => {
-    particle.updateAndMove(particles, classesMatrix, world)
+    particle.updateAndMove(particles, classesMatrix, world, mouseBall)
   })
   if(document.workingAnimationFrames[id]){
-    window.requestAnimationFrame( () => {checkGravity(particles, classesMatrix, id)})
+    window.requestAnimationFrame( () => {particlesUpdate(particles, classesMatrix, mouseBall, id)})
   }
 }
 
@@ -146,5 +149,46 @@ const inputListener = () => {
   interactionMinInput.attr("value", world.distMin)
   interactionMinInput.on("input", () => {
     world.distMin = interactionMinInput.property("value")
+  })
+
+  const interactionMouseRadius = d3.select("#mouse_radius")
+  interactionMouseRadius.attr("value", world.distMin)
+  interactionMouseRadius.on("input", () => {
+    world.mouseRadius = interactionMouseRadius.property("value")
+    d3.select("#mouse_ball")
+      .transition()
+      .duration(100)
+      .attr("r", world.mouseRadius)
+  })
+
+  const interactionMinInput = d3.select("#minimum_input")
+  interactionMinInput.attr("value", world.distMin)
+  interactionMinInput.on("input", () => {
+    world.distMin = interactionMinInput.property("value")
+  })
+}
+
+const mouseListener = (svg, mouseBall) => {
+  svg.on("mousedown", () => {
+    world.mouseActive = true
+    mouseBall.attr("cx", event.x)
+             .attr("cy", event.y - padding)
+             .transition()
+             .duration(150)
+             .style("opacity", 1)
+  })
+  svg.on("mouseup", () => {
+    world.mouseActive = false
+    mouseBall.transition()
+             .duration(150)
+             .style("opacity", 0)
+  })
+  svg.on("mousemove", () => {
+    if(world.mouseActive){
+      mouseBall.attr("cx", event.x)
+               .attr("cy", event.y - padding)
+      world.mouseXvel = event.movementX
+      world.mouseYvel = event.movementY
+    }
   })
 }

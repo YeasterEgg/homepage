@@ -4,22 +4,12 @@ export class Particle {
   constructor(data) {
     // INSTANCE VARIABLES
     this.id = data.id
-    this.r  = data.r
     this.x = data.x
     this.y = data.y
 
     // CLASS VARIABLES
-    this.sw = data.sw
     this.color = data.color
     this.classId = data.classId
-
-    // WORLD VARIABLES
-    this.w  = data.w
-    this.h  = data.h
-    this.M  = data.M
-    this.at = data.at
-    this.distMin = data.distMin
-    this.distMax = data.distMax
 
     // STANDARD VARIABLES
     this.xv = 0
@@ -27,15 +17,15 @@ export class Particle {
     this.particle = null
   }
 
-  put(svg) {
+  put(svg, world) {
     this.particle = svg.append("circle")
-                       .attr("r", this.r)
+                       .attr("r", world.particleRadius)
                        .attr("cx", this.x)
                        .attr("cy", this.y)
                        .attr("fill", "transparent")
                        .attr("id", this.id)
                        .attr("stroke", this.color)
-                       .attr("stroke-width", this.sw)
+                       .attr("stroke-width", world.strokeWidth)
     this.particle
         .on("click", () => {this.onClick()})
   }
@@ -45,55 +35,44 @@ export class Particle {
     this.yv = 0
   }
 
-  updateAndMove(particles, matrix, world) {
-    this.updateWorld(world)
-    this.checkBorders()
-    this.checkInteractions(particles, matrix)
-    this.addAttrition()
+  updateAndMove(particles, matrix, world, mouseBall) {
+    this.checkBorders(world)
+    this.checkInteractions(world, particles, matrix)
+    this.checkMouse(world, mouseBall)
+    this.addAttrition(world)
     this.move()
   }
 
-  updateWorld(world) {
-    this.w  = world.w
-    this.h  = world.h
-    this.M  = world.M
-    this.at = world.attrition
-    this.distMin = world.distMin
-    this.distMax = world.distMax
-    this.r  = world.particleRadius
-    this.sw = world.strokeWidth
-  }
-
-  checkBorders() {
-    if(this.x < this.r){
+  checkBorders(world) {
+    if(this.x < world.particleRadius){
       this.xv += -2 * this.xv
-      this.x = this.r
-    }else if (this.x > (this.w - this.r)){
+      this.x = world.particleRadius
+    }else if (this.x > (world.w - world.particleRadius)){
       this.xv += -2 * this.xv
-      this.x = this.w - this.r
+      this.x = world.w - world.particleRadius
     }
 
-    if(this.y < this.r){
+    if(this.y < world.particleRadius){
       this.yv += -2 * this.yv
-      this.y = this.r
-    }else if (this.y > (this.h - this.r)){
+      this.y = world.particleRadius
+    }else if (this.y > (world.h - world.particleRadius)){
       this.yv += -2 * this.yv
-      this.y = this.h - this.r
+      this.y = world.h - world.particleRadius
     }
   }
 
-  checkInteractions(particles, matrix) {
+  checkInteractions(world, particles, matrix) {
     particles.map( (particle) => {
       if(particle != this){
         const dx = particle.x - this.x
         const dy = particle.y - this.y
         const dist = Math.sqrt( dx ** 2 + dy ** 2 )
-        if(dist < this.distMax && dist > this.distMin){
+        if(dist < world.distMax && dist > world.distMin){
           const angle = Math.atan2(dy, dx)
           const coeff = matrix[this.classId][particle.classId]
-          this.xv +=  coeff * (Math.cos(angle) * this.M) / (this.r * dist)
-          this.yv +=  coeff * (Math.sin(angle) * this.M) / (this.r * dist)
-          // if(dist < this.r + particle.r){
+          this.xv +=  coeff * (Math.cos(angle) * world.M) / (world.particleRadius * dist)
+          this.yv +=  coeff * (Math.sin(angle) * world.M) / (world.particleRadius * dist)
+          // if(dist < world.particleRadius + particle.r){
           //   this.x -= this.x < particle.x ? (dist - dx) : -(dist - dx)
           //   this.y -= this.y < particle.y ? (dist - dy) : -(dist - dy)
           //   this.xv += -2 * this.xv
@@ -104,9 +83,21 @@ export class Particle {
     })
   }
 
-  addAttrition() {
-    this.xv *= this.at
-    this.yv *= this.at
+  checkMouse(world, mouseBall) {
+    if(world.mouseActive){
+      const dx = mouseBall.attr("cx") - this.x
+      const dy = mouseBall.attr("cy") - this.y
+      const dist = Math.sqrt( dx ** 2 + dy ** 2 )
+      if(dist < world.mouseRadius + world.particleRadius){
+        this.xv += world.mouseXvel * world.mouseWeight
+        this.yv += world.mouseYvel * world.mouseWeight
+      }
+    }
+  }
+
+  addAttrition(world) {
+    this.xv *= world.attrition
+    this.yv *= world.attrition
   }
 
   move() {
