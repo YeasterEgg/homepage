@@ -35,6 +35,8 @@ def home():
 @app.route("/<template>", methods=["GET"])
 def template(template):
   template_file = '{}.html'.format(template)
+  text = "We bellezza, qualcuno ha guardato la pagina {template}, micacazzi!".format(template=template)
+  send_to_telegram(text)
   return render_template(template_file)
 
 @app.route("/visited_website", methods=["GET"])
@@ -79,18 +81,10 @@ def favicon():
   return send_file(img_io, mimetype='image/png')
 
 @socketio.on('websiteSelected')
-def handle_my_custom_event(data):
+def website_selected(data):
   website = data["website"]
-  message = {
-    "chat_id": CHAT_ID,
-    "text": "We strunz, qualcuno ha controllato il sito {website}, micacazzi!".format(website=website),
-  }
-  url = "https://api.telegram.org/bot{token}/sendMessage".format(token=TELEGRAM_TOKEN)
-  if ENV == "production":
-    req = grequests.post(url, data=message)
-    grequests.map([req])
-  else:
-    print(message["text"])
+  text = "We bellezza, qualcuno ha cliccato sulla cellula di {website}, micacazzi!".format(website=website)
+  send_to_telegram(text)
 
 def random_tuple(n = 1):
   return tuple((randint(0,255), randint(0,255), randint(0,255)) for i in range(n))
@@ -100,6 +94,18 @@ def visited_website(website):
 
 def researched_recipe(recipe, url):
   socketio.emit('recipe_searched', {'recipe_name': recipe, 'url': url})
+
+def send_to_telegram(text):
+  message = {
+    "chat_id": CHAT_ID,
+    "text": text
+  }
+  url = "https://api.telegram.org/bot{token}/sendMessage".format(token=TELEGRAM_TOKEN)
+  if ENV == "production":
+    req = grequests.post(url, data=message)
+    grequests.map([req])
+  else:
+    print(message["text"])
 
 if __name__ == "__main__":
   socketio.run(app, host="127.0.0.1", port=4002, debug=app.config['DEBUG'])
