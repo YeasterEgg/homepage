@@ -11,7 +11,6 @@ svg{
 
 .sliders_container{
   width: 50%;
-  padding-left: 10%;
   display: inline-block;
 }
 
@@ -80,4 +79,24 @@ svg{
   height: 35px;
   width: 60px;
   text-align: center;
+}
+
+.momentum{
+  padding-top: 20px;
+  display: inline-block;
+  width: 10%;
+  z-index: 10;
+  font-size: 20px;
+  text-align: left;
+  vertical-align: top;
+  height: 100%;
+  margin: auto;
+}
+
+.letter{
+  text-decoration: overline;
+}
+
+.current_momentum{
+  font-weight: bolder;
 }

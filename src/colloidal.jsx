@@ -42,8 +42,8 @@ const stopOldAnimation = (size) => {
   })
 }
 
-const startNewAnimation = (size = 3, emptySpace = 20) => {
-  stopOldAnimation(size, emptySpace)
+const startNewAnimation = (size = 3, particlesNumber = 100) => {
+  stopOldAnimation(size, particlesNumber)
   const particleClasses = colorList.slice(0,size).map((color) => { return {color: color} })
   const classesMatrix = particleClasses.map( (color, idx) => {
     return particleClasses.map(() => {
@@ -57,56 +57,54 @@ const startNewAnimation = (size = 3, emptySpace = 20) => {
                 .attr("height", world.h+"px")
                 .style("position", "absolute")
                 .style("top", padding + "px")
-  const particles = addParticles(svg, particleClasses, emptySpace)
+  const particles = addParticles(svg, particleClasses, particlesNumber)
   const mouseBall = svg.append("circle")
                        .attr("r", world.mouseRadius)
                        .attr("fill", "white")
                        .attr("id", "mouse_ball")
                        .style("opacity", 0)
   mouseListener(svg, mouseBall)
-  const id = size + "_" + emptySpace
+  const id = size + "_" + particlesNumber
   document.workingAnimationFrames[id] = true
   window.requestAnimationFrame( () => {particlesUpdate(particles, classesMatrix, mouseBall, id)})
 }
 
-const particleHash = (id, x, y, color, classId) => {
+const particleHash = (x, y, color, classId) => {
   return {
-    id: id,
     x: x,
     y: y,
     color: color,
     classId: classId,
+    w: 1,
   }
 }
 
-const addParticles = (svg, particleClasses, emptySpace) => {
+const addParticles = (svg, particleClasses, particlesNumber) => {
   const particles = []
-  const gridHorLength = Math.round(world.w / (world.particleRadius * emptySpace))
-  const gridVerLength = Math.round(world.h / (world.particleRadius * emptySpace))
-  const gridHorSize = world.w / gridHorLength
-  const gridVerSize = world.h / gridVerLength
-  times(gridHorLength, (horIdx) => {
-    times(gridVerLength, (verIdx) => {
-      const particle = randomClassParticle(gridHorSize, gridVerSize, horIdx, verIdx, particleClasses)
-      particle.put(svg, world)
-      particles.push(particle)
-    })
+  times(particlesNumber, (idx) => {
+    const particle = randomClassParticle(idx, particleClasses)
+    particle.put(svg, world)
+    particles.push(particle)
   })
   return particles
 }
 
-const randomClassParticle = (gridHorSize, gridVerSize, horIdx, verIdx, particleClasses) => {
+const randomClassParticle = (idx, particleClasses) => {
   const classId = Math.floor(Math.random() * particleClasses.length)
   const particleClass = particleClasses[classId]
-  const x = gridHorSize * horIdx + gridHorSize / 2 + (Math.random() - 0.5) * gridHorSize
-  const y = gridVerSize * verIdx + gridVerSize / 2 + (Math.random() - 0.5) * gridVerSize
-  return new Particle(particleHash("c" + classId + "-" + horIdx + "_" + verIdx, x, y, particleClass.color, classId))
+  const x = Math.random() * world.w
+  const y = Math.random() * world.h
+  return new Particle(particleHash(x, y, particleClass.color, classId))
 }
 
 const particlesUpdate = (particles, classesMatrix, mouseBall, id) => {
+  let momentum = 0
   particles.map((particle) => {
     particle.updateAndMove(particles, classesMatrix, world, mouseBall)
+    momentum += particle.getMomentum()
   })
+  momentum /= particles.length
+  d3.select(".current_momentum").text(Math.round(momentum * 100) / 100)
   if(document.workingAnimationFrames[id]){
     window.requestAnimationFrame( () => {particlesUpdate(particles, classesMatrix, mouseBall, id)})
   }
@@ -124,13 +122,13 @@ const inputListener = () => {
   const sizeInput = d3.select("#size_input")
   sizeInput.attr("value", 3)
   sizeInput.on("input", () => {
-    startNewAnimation(sizeInput.property("value"), emptySpaceInput.property("value"))
+    startNewAnimation(sizeInput.property("value"), particlesNumberInput.property("value"))
   })
 
-  const emptySpaceInput = d3.select("#empty_space")
-  emptySpaceInput.attr("value", 20)
-  emptySpaceInput.on("input", () => {
-    startNewAnimation(sizeInput.property("value"), emptySpaceInput.property("value"))
+  const particlesNumberInput = d3.select("#particles_number")
+  particlesNumberInput.attr("value", 100)
+  particlesNumberInput.on("input", () => {
+    startNewAnimation(sizeInput.property("value"), particlesNumberInput.property("value"))
   })
 
   const attritionInput = d3.select("#attrition_input")
@@ -154,17 +152,16 @@ const inputListener = () => {
   const interactionMouseRadius = d3.select("#mouse_radius")
   interactionMouseRadius.attr("value", world.mouseRadius)
   interactionMouseRadius.on("input", () => {
-    world.mouseRadius = interactionMouseRadius.property("value")
+    world.mouseRadius = parseInt(interactionMouseRadius.property("value"))
     d3.select("#mouse_ball")
-      .transition()
-      .duration(100)
       .attr("r", world.mouseRadius)
+    console.log(d3.select("#mouse_ball"))
   })
 
   const interactionMouseWeight = d3.select("#mouse_weight")
   interactionMouseWeight.attr("value", world.mouseWeight)
   interactionMouseWeight.on("input", () => {
-    world.mouseWeight = interactionMouseWeight.property("value")
+    world.mouseWeight = parseInt(interactionMouseWeight.property("value"))
   })
 }
 

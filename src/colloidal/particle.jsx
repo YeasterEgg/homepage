@@ -3,9 +3,9 @@ const d3 = require('d3')
 export class Particle {
   constructor(data) {
     // INSTANCE VARIABLES
-    this.id = data.id
     this.x = data.x
     this.y = data.y
+    this.w = data.w
 
     // CLASS VARIABLES
     this.color = data.color
@@ -22,10 +22,7 @@ export class Particle {
                        .attr("r", world.particleRadius)
                        .attr("cx", this.x)
                        .attr("cy", this.y)
-                       .attr("fill", "transparent")
-                       .attr("id", this.id)
-                       .attr("stroke", this.color)
-                       .attr("stroke-width", world.strokeWidth)
+                       .attr("fill", this.color)
     this.particle
         .on("click", () => {this.onClick()})
   }
@@ -106,6 +103,10 @@ export class Particle {
     this.particle
         .attr("cx", this.x)
         .attr("cy", this.y)
+  }
+
+  getMomentum() {
+    return this.w * Math.sqrt(this.xv ** 2 + this.yv ** 2)
   }
 
   secretPenisSvg() {
