@@ -18,7 +18,6 @@ const world = {
   h: Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - padding,
   particleRadius: 3,
   strokeWidth: 6,
-  emptySpace: 20,
   attrition: 0.95,
   distMin: 5,
   distMax: 200,
@@ -38,24 +37,25 @@ const stopOldAnimation = (size) => {
   })
 }
 
-const startNewAnimation = (size = 3) => {
-  stopOldAnimation(size)
+const startNewAnimation = (size = 3, emptySpace = 20) => {
+  stopOldAnimation(size, emptySpace)
   const particleClasses = colorList.slice(0,size).map((color) => { return {color: color} })
   const classesMatrix = particleClasses.map( (color, idx) => {
     return particleClasses.map(() => {
       return -1
     })
   })
-  sliders.drawSliders(, , "#info_menu", particleClasses, classesMatrix, world.w)
+  sliders.drawSliders(particleClasses, classesMatrix, world.w)
   const svg = d3.select("body")
                 .append("svg")
                 .attr("width", world.w+"px")
                 .attr("height", world.h+"px")
                 .style("position", "absolute")
                 .style("top", padding + "px")
-  const particles = addParticles(svg, particleClasses)
-  document.workingAnimationFrames[size] = true
-  window.requestAnimationFrame( () => {checkGravity(particles, classesMatrix, size)})
+  const particles = addParticles(svg, particleClasses, emptySpace)
+  const id = size + "_" + emptySpace
+  document.workingAnimationFrames[id] = true
+  window.requestAnimationFrame( () => {checkGravity(particles, classesMatrix, id)})
 }
 
 const particleHash = (id, x, y, color, classId) => {
@@ -76,10 +76,10 @@ const particleHash = (id, x, y, color, classId) => {
   }
 }
 
-const addParticles = (svg, particleClasses) => {
+const addParticles = (svg, particleClasses, emptySpace) => {
   const particles = []
-  const gridHorLength = Math.round(world.w / (world.particleRadius * world.emptySpace))
-  const gridVerLength = Math.round(world.h / (world.particleRadius * world.emptySpace))
+  const gridHorLength = Math.round(world.w / (world.particleRadius * emptySpace))
+  const gridVerLength = Math.round(world.h / (world.particleRadius * emptySpace))
   const gridHorSize = world.w / gridHorLength
   const gridVerSize = world.h / gridVerLength
   times(gridHorLength, (horIdx) => {
@@ -118,13 +118,33 @@ const times = (n,callback) => {
 }
 
 const inputListener = () => {
-  const sizeInput = d3.select("#size_choice")
+  const sizeInput = d3.select("#size_input")
+  sizeInput.attr("value", 3)
   sizeInput.on("input", () => {
-    startNewAnimation(sizeInput.property("value"))
+    startNewAnimation(sizeInput.property("value"), emptySpaceInput.property("value"))
   })
 
-  const attritionInput = d3.select("#attrition_choice")
+  const emptySpaceInput = d3.select("#empty_space")
+  emptySpaceInput.attr("value", 20)
+  emptySpaceInput.on("input", () => {
+    startNewAnimation(sizeInput.property("value"), emptySpaceInput.property("value"))
+  })
+
+  const attritionInput = d3.select("#attrition_input")
+  attritionInput.attr("value", world.attrition)
   attritionInput.on("input", () => {
     world.attrition = attritionInput.property("value")
+  })
+
+  const mInput = d3.select("#m_input")
+  mInput.attr("value", world.M)
+  mInput.on("input", () => {
+    world.M = mInput.property("value")
+  })
+
+  const interactionMinInput = d3.select("#minimum_input")
+  interactionMinInput.attr("value", world.distMin)
+  interactionMinInput.on("input", () => {
+    world.distMin = interactionMinInput.property("value")
   })
 }

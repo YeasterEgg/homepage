@@ -128,7 +128,7 @@ const shuffleArray = (array) => {
 const listenToHamburg = () => {
   d3.select("#hamburg_menu")
     .on("click", () => {
-      window.location = "/gravity"
+      window.location = "/colloidal"
     })
 }
 
