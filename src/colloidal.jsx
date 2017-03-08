@@ -152,7 +152,7 @@ const inputListener = () => {
   })
 
   const interactionMouseRadius = d3.select("#mouse_radius")
-  interactionMouseRadius.attr("value", world.distMin)
+  interactionMouseRadius.attr("value", world.mouseRadius)
   interactionMouseRadius.on("input", () => {
     world.mouseRadius = interactionMouseRadius.property("value")
     d3.select("#mouse_ball")
@@ -161,10 +161,10 @@ const inputListener = () => {
       .attr("r", world.mouseRadius)
   })
 
-  const interactionMinInput = d3.select("#minimum_input")
-  interactionMinInput.attr("value", world.distMin)
-  interactionMinInput.on("input", () => {
-    world.distMin = interactionMinInput.property("value")
+  const interactionMouseWeight = d3.select("#mouse_weight")
+  interactionMouseWeight.attr("value", world.mouseWeight)
+  interactionMouseWeight.on("input", () => {
+    world.mouseWeight = interactionMouseWeight.property("value")
   })
 }
 
