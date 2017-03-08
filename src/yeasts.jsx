@@ -81,7 +81,6 @@ const adamHash = {
 }
 
 const drawWebsites = (websites) => {
-  listenToHamburg()
   const container = d3.select("body")
                       .append("svg")
   const svg = container.attr("width", w+"px")
@@ -123,13 +122,6 @@ const shuffleArray = (array) => {
     array[i] = t
   }
   return array;
-}
-
-const listenToHamburg = () => {
-  d3.select("#hamburg_menu")
-    .on("click", () => {
-      window.location = "/colloidal"
-    })
 }
 
 socket.on('connect', function() {

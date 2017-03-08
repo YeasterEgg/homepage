@@ -6,19 +6,20 @@ export const drawSliders = (particleClasses, classesMatrix, w) => {
 }
 
 const addSliders = (particleClasses, classesMatrix, w) => {
-  const slidersContainer = d3.select(".sliders_container")
+  const slidersContainer = d3.select(".colloidal-sliders_container")
   particleClasses.map( (particleClass1, idx1) => {
     const row = slidersContainer.append("div")
-                                .attr("class", "slider_row")
+                                .attr("class", "colloidal-slider_row")
     particleClasses.map( (particleClass2, idx2) => {
-      const width = Math.floor((w - 70) / particleClasses.length) * 0.5 + "px"
+      const width = Math.floor((w - 70) / particleClasses.length) * 0.45 + "px"
 
       const div = row.append("div")
                      .style("display", "inline-block")
                      .attr("width", width)
+                     .attr("class", "colloidal-slider_container")
 
       const slider = div.append("input")
-                        .attr("class", "slider")
+                        .attr("class", "colloidal-slider")
                         .attr("type", "range")
                         .attr("min", "-1")
                         .attr("max", "1")
@@ -43,14 +44,33 @@ const onChange = (slider, idx1, idx2, classesMatrix) => {
 
 const menuListener = () => {
   let menuVisible = false
-  d3.select("#hamburg_menu").on("click", () => {
+  const sliderMenu = d3.select(".colloidal-menu_container")
+  d3.select(".colloidal-hamburg_menu").on("click", () => {
     if(menuVisible){
-      d3.select("#info_menu")
-        .style("display", "none")
+      sliderMenu.transition()
+                .duration(300)
+                .style("opacity", 0)
+                .on("end", () => {
+                  sliderMenu.style("display", "none")
+                })
     }else{
-      d3.select("#info_menu")
-        .style("display", "block")
+      sliderMenu.style("display", "block")
+                .transition()
+                .duration(300)
+                .style("opacity", 1)
     }
+    menuVisible = !menuVisible
+  })
+
+  d3.select(".colloidal-menu_closebutton").on("click", () => {
+    if(menuVisible){
+      sliderMenu.transition()
+                .duration(300)
+                .style("opacity", 0)
+                .on("end", () => {
+                  sliderMenu.style("display", "none")
+                })
+      }
     menuVisible = !menuVisible
   })
 }

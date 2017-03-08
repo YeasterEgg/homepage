@@ -1,21 +1,20 @@
 const d3 = require('d3')
 const sliders = require("./colloidal/sliders.jsx")
 const Particle = require("./colloidal/particle.jsx").Particle
-const padding = 175
 document.workingAnimationFrames = {}
 
 const colorList = [
-  "blue",
+  "lightblue",
   "red",
-  "grey",
-  "black",
+  "yellow",
+  "green",
   "orange",
-  "green"
+  "lightgrey"
 ]
 
 const world = {
   w: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
-  h: Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - padding,
+  h: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
   particleRadius: 5,
   strokeWidth: 6,
   attrition: 0.95,
@@ -36,13 +35,13 @@ export const startAnimation = () => {
 
 const stopOldAnimation = (size) => {
   d3.selectAll("svg").remove()
-  d3.selectAll(".slider_row").remove()
+  d3.selectAll(".colloidal-slider_row").remove()
   Object.keys(document.workingAnimationFrames).map( (id) => {
     document.workingAnimationFrames[id] = false
   })
 }
 
-const startNewAnimation = (size = 3, particlesNumber = 100) => {
+const startNewAnimation = (size = 3, particlesNumber = 200) => {
   stopOldAnimation(size, particlesNumber)
   const particleClasses = colorList.slice(0,size).map((color) => { return {color: color} })
   const classesMatrix = particleClasses.map( (color, idx) => {
@@ -56,12 +55,12 @@ const startNewAnimation = (size = 3, particlesNumber = 100) => {
                 .attr("width", world.w+"px")
                 .attr("height", world.h+"px")
                 .style("position", "absolute")
-                .style("top", padding + "px")
   const particles = addParticles(svg, particleClasses, particlesNumber)
   const mouseBall = svg.append("circle")
                        .attr("r", world.mouseRadius)
-                       .attr("fill", "white")
-                       .attr("id", "mouse_ball")
+                       .attr("fill", "black")
+                       .attr("id", "colloidal-mouse_ball")
+                       .attr("stroke", "white")
                        .style("opacity", 0)
   mouseListener(svg, mouseBall)
   const id = size + "_" + particlesNumber
@@ -104,7 +103,7 @@ const particlesUpdate = (particles, classesMatrix, mouseBall, id) => {
     momentum += particle.getMomentum()
   })
   momentum /= particles.length
-  d3.select(".current_momentum").text(Math.round(momentum * 100) / 100)
+  d3.select(".colloidal-momentum_value").text(Math.round(momentum * 100) / 100)
   if(document.workingAnimationFrames[id]){
     window.requestAnimationFrame( () => {particlesUpdate(particles, classesMatrix, mouseBall, id)})
   }
@@ -119,46 +118,46 @@ const times = (n,callback) => {
 }
 
 const inputListener = () => {
-  const sizeInput = d3.select("#size_input")
+  const sizeInput = d3.select("#colloidal-size_input")
   sizeInput.attr("value", 3)
   sizeInput.on("input", () => {
     startNewAnimation(sizeInput.property("value"), particlesNumberInput.property("value"))
   })
 
-  const particlesNumberInput = d3.select("#particles_number")
-  particlesNumberInput.attr("value", 100)
+  const particlesNumberInput = d3.select("#colloidal-particles_number")
+  particlesNumberInput.attr("value", 200)
   particlesNumberInput.on("input", () => {
     startNewAnimation(sizeInput.property("value"), particlesNumberInput.property("value"))
   })
 
-  const attritionInput = d3.select("#attrition_input")
+  const attritionInput = d3.select("#colloidal-attrition_input")
   attritionInput.attr("value", world.attrition)
   attritionInput.on("input", () => {
     world.attrition = attritionInput.property("value")
   })
 
-  const mInput = d3.select("#m_input")
+  const mInput = d3.select("#colloidal-m_input")
   mInput.attr("value", world.M)
   mInput.on("input", () => {
     world.M = mInput.property("value")
   })
 
-  const interactionMinInput = d3.select("#minimum_input")
+  const interactionMinInput = d3.select("#colloidal-minimum_input")
   interactionMinInput.attr("value", world.distMin)
   interactionMinInput.on("input", () => {
     world.distMin = interactionMinInput.property("value")
   })
 
-  const interactionMouseRadius = d3.select("#mouse_radius")
+  const interactionMouseRadius = d3.select("#colloidal-mouse_radius")
   interactionMouseRadius.attr("value", world.mouseRadius)
   interactionMouseRadius.on("input", () => {
     world.mouseRadius = parseInt(interactionMouseRadius.property("value"))
-    d3.select("#mouse_ball")
+    d3.select("#colloidal-mouse_ball")
       .attr("r", world.mouseRadius)
-    console.log(d3.select("#mouse_ball"))
+    console.log(d3.select("#colloidal-mouse_ball"))
   })
 
-  const interactionMouseWeight = d3.select("#mouse_weight")
+  const interactionMouseWeight = d3.select("#colloidal-mouse_weight")
   interactionMouseWeight.attr("value", world.mouseWeight)
   interactionMouseWeight.on("input", () => {
     world.mouseWeight = parseInt(interactionMouseWeight.property("value"))
@@ -169,7 +168,7 @@ const mouseListener = (svg, mouseBall) => {
   svg.on("mousedown", () => {
     world.mouseActive = true
     mouseBall.attr("cx", event.x)
-             .attr("cy", event.y - padding)
+             .attr("cy", event.y)
              .transition()
              .duration(150)
              .style("opacity", 1)
@@ -183,7 +182,7 @@ const mouseListener = (svg, mouseBall) => {
   svg.on("mousemove", () => {
     if(world.mouseActive){
       mouseBall.attr("cx", event.x)
-               .attr("cy", event.y - padding)
+               .attr("cy", event.y)
       world.mouseXvel = event.movementX
       world.mouseYvel = event.movementY
     }
