@@ -16,7 +16,7 @@ const colorList = [
 const world = {
   w: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
   h: Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - padding,
-  particleRadius: 3,
+  particleRadius: 5,
   strokeWidth: 6,
   attrition: 0.95,
   distMin: 5,
