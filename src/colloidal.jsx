@@ -1,226 +1,290 @@
 const d3 = require('d3')
-const sliders = require("./colloidal/sliders.jsx")
+const drawSliders = require("./colloidal/sliders.jsx").drawSliders
 const Particle = require("./colloidal/particle.jsx").Particle
-document.workingAnimationFrames = {}
 
-const colorList = [
-  "lightblue",
-  "red",
-  "yellow",
-  "green",
-  "orange",
-  "lightgrey"
-]
+///////////////////////
+// SYSTEM VARIABLES //
+/////////////////////
 
 const world = {
-  w: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
-  h: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
-  particleRadius: 5,
-  strokeWidth: 6,
+  arrowMultiplier: 20,
   attrition: 0.95,
-  distMin: 5,
+  classesMatrix: null,
+  colorList: [
+    "lightblue",
+    "red",
+    "yellow",
+    "green",
+    "orange",
+    "lightgrey"
+  ],
+  currentClasses: 3,
   distMax: 200,
+  distMin: 5,
+  h: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
   M: 10,
-  mouseRadius: 15,
-  mouseWeight: 1,
   mouseActive: false,
+  mouseBall: null,
+  mouseRadius: 15,
   mouseXvel: 0,
+  mouseWeight: 1,
   mouseYvel: 0,
+  particleClasses: null,
+  particleRadius: 5,
+  particles: [],
+  particlesNumber: 150,
+  running: true,
+  strokeWidth: 6,
+  svg: null,
   systemEnergy: 3,
-  running: true
+  w: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
 }
+
+//////////////////////
+// BASIC FUNCTIONS //
+////////////////////
 
 export const startAnimation = () => {
-  inputListener()
   startNewAnimation()
+  drawSliders(world)
+  startAllListeners()
 }
 
-const stopOldAnimation = (size) => {
-  d3.selectAll("svg").remove()
-  d3.selectAll(".colloidal-slider_row").remove()
-  Object.keys(document.workingAnimationFrames).map( (id) => {
-    document.workingAnimationFrames[id] = false
-  })
+const times = (a,callback) => {
+  const b = a
+  while(a > 0){
+    callback(b - a)
+    a--
+  }
 }
 
-const startNewAnimation = (size = 3, particlesNumber = 200) => {
-  stopOldAnimation(size, particlesNumber)
-  const particleClasses = colorList.slice(0,size).map((color) => { return {color: color} })
-  const classesMatrix = particleClasses.map( (color, idx) => {
-    return particleClasses.map(() => {
+//////////////////////////
+// ANIMATION FUNCTIONS //
+////////////////////////
+
+const startNewAnimation = () => {
+  world.particleClasses = world.colorList.slice(0,world.currentClasses).map((color) => { return {color: color} })
+  world.classesMatrix = world.particleClasses.map( (color, idx) => {
+    return world.particleClasses.map(() => {
       return -1
     })
   })
-  sliders.drawSliders(particleClasses, classesMatrix, world.w)
-  const svg = d3.select("body")
+  world.svg = d3.select("body")
                 .append("svg")
                 .attr("width", world.w+"px")
                 .attr("height", world.h+"px")
                 .style("position", "absolute")
-  const particles = addParticles(svg, particleClasses, particlesNumber)
-  const mouseBall = svg.append("circle")
-                       .attr("r", world.mouseRadius)
-                       .attr("fill", "black")
-                       .attr("id", "colloidal-mouse_ball")
-                       .attr("stroke", "white")
-                       .style("opacity", 0)
-  mouseListener(svg, mouseBall)
-  const id = size + "_" + particlesNumber
-  pauseListener(particles, classesMatrix, mouseBall, id)
-  document.workingAnimationFrames[id] = true
-  window.requestAnimationFrame( () => {particlesUpdate(particles, classesMatrix, mouseBall, id)})
+  world.particles = addParticles()
+  world.mouseBall = world.svg
+                         .append("circle")
+                         .attr("r", world.mouseRadius)
+                         .attr("fill", "black")
+                         .attr("id", "colloidal-mouse_ball")
+                         .attr("stroke", "white")
+                         .style("opacity", 0)
+  world.running = true
+  window.requestAnimationFrame( () => {particlesUpdate()})
 }
 
-const pauseListener = (particles, classesMatrix, mouseBall, id) => {
-  const interactionSystemPause = d3.select(".colloidal-pause_button")
+//////////////////////
+// INPUT FUNCTIONS //
+////////////////////
+
+const startAllListeners = () => {
+  inputListener()
+  pauseListener()
+  mouseListener()
+  windowResizeListener()
+}
+
+const inputListener = () => {
+  const inputs = {
+    attrition: ["#colloidal-attrition_input", (value, key) => {world[key] = parseInt(value)}],
+    M: ["#colloidal-m_input", (value, key) => {world[key] = parseInt(value)}],
+    distMin: ["#colloidal-minimum_input", (value, key) => {world[key] = parseInt(value)}],
+    systemEnergy: ["#colloidal-system_energy", (value, key) => {world[key] = parseInt(value)}],
+    mouseWeight: ["#colloidal-mouse_weight", (value, key) => {world[key] = parseInt(value)}],
+    currentClasses: ["#colloidal-size_input", setNewClassesNumber],
+    particlesNumber: ["colloidal-particles_number", setNewParticleNumber],
+    mouseRadius: ["#colloidal-mouse_radius", setMouseRadius]
+  }
+
+  Object.keys(inputs).map( (key) => {
+    const inputElement = d3.select(inputs[key][0])
+    inputElement.attr("value", world[key])
+    inputElement.on("input", () => {
+      inputs[key][1](inputElement.property("value"), key)
+    })
+  })
+}
+
+const pauseListener = () => {
   const particleSpeed = d3.select(".colloidal-particle_container")
-  interactionSystemPause.on("click", () => {
+  d3.select(".colloidal-pause_button").on("click", () => {
     if(world.running){
-      document.workingAnimationFrames[id] = false
+      world.running = false
       particleSpeed.style("display", "block")
                    .transition()
                    .duration(200)
                    .style("opacity", 1)
 
+      world.particles.map( (particle) => {
+        particle.drawArrow(world)
+      })
+
       d3.select(".material-icons").text("play_arrow")
     }else{
-      document.workingAnimationFrames[id] = true
+      world.running = true
       particleSpeed.transition()
                    .duration(200)
                    .style("opacity", 0)
                    .on("end", () => {
                       particleSpeed.style("display", "none")
                    })
+
+      world.particles.map( (particle) => {
+        particle.removeArrow()
+      })
+
       d3.select(".material-icons").text("pause")
-      window.requestAnimationFrame( () => {particlesUpdate(particles, classesMatrix, mouseBall, id)})
+      window.requestAnimationFrame( () => {particlesUpdate()})
     }
-    world.running = !world.running
   })
 }
 
-const particleHash = (x, y, color, classId) => {
-  return {
-    x: x,
-    y: y,
-    color: color,
-    classId: classId,
-    w: 1,
+const windowResizeListener = () => {
+  window.onresize = () => {
+    world.w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
+    world.h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+    world.svg
+         .attr("width", world.w+"px")
+         .attr("height", world.h+"px")
   }
 }
 
-const addParticles = (svg, particleClasses, particlesNumber) => {
+const mouseListener = () => {
+  world.svg.on("mousedown", () => {
+    world.mouseActive = true
+    world.mouseBall
+         .attr("cx", event.x)
+         .attr("cy", event.y)
+         .transition()
+         .duration(150)
+         .style("opacity", 1)
+  })
+  world.svg.on("mouseup", () => {
+    world.mouseActive = false
+    world.mouseBall
+         .transition()
+         .duration(150)
+         .style("opacity", 0)
+  })
+  world.svg.on("mousemove", () => {
+    if(world.mouseActive){
+      world.mouseBall
+           .attr("cx", event.x)
+           .attr("cy", event.y)
+      world.mouseXvel = event.movementX
+      world.mouseYvel = event.movementY
+    }
+  })
+}
+
+/////////////////////////
+// RESPONSE FUNCTIONS //
+///////////////////////
+
+const setNewParticleNumber = (newParticlesNumber) => {
+  const diff = world.particlesNumber - parseInt(newParticlesNumber)
+  let agendaParticle
+  if(diff > 0){
+    times(diff, (idx) => {
+      agendaParticle = world.particles.pop()
+      agendaParticle.remove()
+    })
+  }else if(diff < 0){
+    times(-diff, (idx) => {
+      const agendaParticle = randomClassParticle(world.particlesNumber + idx)
+      agendaParticle.put(world.svg, world)
+      world.particles.push(agendaParticle)
+    })
+  }
+  world.particlesNumber = newParticlesNumber
+}
+
+const setNewClassesNumber = (newClassesNumber) => {
+  if(newClassesNumber > world.currentClasses){
+    world.particleClasses = world.colorList.slice(0, newClassesNumber).map((color) => { return {color: color} })
+    world.classesMatrix = world.particleClasses.map( (color, idx) => {
+      return world.particleClasses.map(() => {
+        return -1
+      })
+    })
+    world.particles.map( (particle, idx) => {
+      if(idx % newClassesNumber == 0){
+        const classId = world.particleClasses.length -1
+        const particleClass = world.particleClasses[classId]
+        particle.redraw(particleClass.color, classId)
+      }
+    })
+  }else if(newClassesNumber < world.currentClasses){
+    world.particleClasses = world.colorList.slice(0,newClassesNumber).map((color) => { return {color: color} })
+    world.classesMatrix = world.particleClasses.map( (color, idx) => {
+      return world.particleClasses.map(() => {
+        return -1
+      })
+    })
+    world.particles.map( (particle) => {
+      if(particle.classId > newClassesNumber - 1){
+        const classId = Math.floor(Math.random() * world.particleClasses.length)
+        const particleClass = world.particleClasses[classId]
+        particle.redraw(particleClass.color, classId)
+      }
+    })
+  }
+  world.currentClasses = newClassesNumber
+  d3.selectAll(".colloidal-slider_row").remove()
+  drawSliders(world)
+}
+
+const setMouseRadius = (value, key) => {
+  world.mouseRadius = parseInt(value)
+  d3.select("#colloidal-mouse_ball")
+    .attr("r", world.mouseRadius)
+}
+
+/////////////////////////
+// PARTICLE FUNCTIONS //
+///////////////////////
+
+const addParticles = () => {
   const particles = []
-  times(particlesNumber, (idx) => {
-    const particle = randomClassParticle(idx, particleClasses)
-    particle.put(svg, world)
+  times(world.particlesNumber, (idx) => {
+    const particle = randomClassParticle(idx)
+    particle.put(world)
     particles.push(particle)
   })
   return particles
 }
 
-const randomClassParticle = (idx, particleClasses) => {
-  const classId = Math.floor(Math.random() * particleClasses.length)
-  const particleClass = particleClasses[classId]
+const randomClassParticle = (idx) => {
+  const classId = Math.floor(Math.random() * world.particleClasses.length)
+  const color = world.particleClasses[classId].color
+  const w = 1
   const x = Math.random() * world.w
   const y = Math.random() * world.h
-  return new Particle(particleHash(x, y, particleClass.color, classId))
+  return new Particle({x: x, y: y, color: color, classId: classId, w: w})
 }
 
-const particlesUpdate = (particles, classesMatrix, mouseBall, id) => {
+const particlesUpdate = () => {
   let momentum = 0
-  particles.map((particle) => {
-    particle.updateAndMove(particles, classesMatrix, world, mouseBall)
+  world.particles.map((particle) => {
+    particle.updateAndMove(world.particles, world.classesMatrix, world, world.mouseBall)
     momentum += particle.getMomentum()
   })
-  momentum /= particles.length
+  momentum /= world.particles.length
   d3.select(".colloidal-momentum_value").text(Math.round(momentum * 100) / 100)
-  if(document.workingAnimationFrames[id]){
-    window.requestAnimationFrame( () => {particlesUpdate(particles, classesMatrix, mouseBall, id)})
+  if(world.running){
+    window.requestAnimationFrame( () => {particlesUpdate()})
   }
-}
-
-const times = (n,callback) => {
-  const m = n
-  while(n > 0){
-    callback(m - n)
-    n--
-  }
-}
-
-const inputListener = () => {
-  const sizeInput = d3.select("#colloidal-size_input")
-  sizeInput.attr("value", 3)
-  sizeInput.on("input", () => {
-    startNewAnimation(sizeInput.property("value"), particlesNumberInput.property("value"))
-  })
-
-  const particlesNumberInput = d3.select("#colloidal-particles_number")
-  particlesNumberInput.attr("value", 200)
-  particlesNumberInput.on("input", () => {
-    startNewAnimation(sizeInput.property("value"), particlesNumberInput.property("value"))
-  })
-
-  const attritionInput = d3.select("#colloidal-attrition_input")
-  attritionInput.attr("value", world.attrition)
-  attritionInput.on("input", () => {
-    world.attrition = attritionInput.property("value")
-  })
-
-  const mInput = d3.select("#colloidal-m_input")
-  mInput.attr("value", world.M)
-  mInput.on("input", () => {
-    world.M = mInput.property("value")
-  })
-
-  const interactionMinInput = d3.select("#colloidal-minimum_input")
-  interactionMinInput.attr("value", world.distMin)
-  interactionMinInput.on("input", () => {
-    world.distMin = interactionMinInput.property("value")
-  })
-
-  const interactionMouseRadius = d3.select("#colloidal-mouse_radius")
-  interactionMouseRadius.attr("value", world.mouseRadius)
-  interactionMouseRadius.on("input", () => {
-    world.mouseRadius = parseInt(interactionMouseRadius.property("value"))
-    d3.select("#colloidal-mouse_ball")
-      .attr("r", world.mouseRadius)
-    console.log(d3.select("#colloidal-mouse_ball"))
-  })
-
-  const interactionMouseWeight = d3.select("#colloidal-mouse_weight")
-  interactionMouseWeight.attr("value", world.mouseWeight)
-  interactionMouseWeight.on("input", () => {
-    world.mouseWeight = parseInt(interactionMouseWeight.property("value"))
-  })
-
-  const interactionSystemEnergy = d3.select("#colloidal-system_energy")
-  interactionSystemEnergy.attr("value", world.systemEnergy)
-  interactionSystemEnergy.on("input", () => {
-    world.systemEnergy = parseInt(interactionSystemEnergy.property("value"))
-  })
-}
-
-const mouseListener = (svg, mouseBall) => {
-  svg.on("mousedown", () => {
-    world.mouseActive = true
-    mouseBall.attr("cx", event.x)
-             .attr("cy", event.y)
-             .transition()
-             .duration(150)
-             .style("opacity", 1)
-  })
-  svg.on("mouseup", () => {
-    world.mouseActive = false
-    mouseBall.transition()
-             .duration(150)
-             .style("opacity", 0)
-  })
-  svg.on("mousemove", () => {
-    if(world.mouseActive){
-      mouseBall.attr("cx", event.x)
-               .attr("cy", event.y)
-      world.mouseXvel = event.movementX
-      world.mouseYvel = event.movementY
-    }
-  })
 }

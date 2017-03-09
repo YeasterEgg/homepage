@@ -1,7 +1,7 @@
 const d3 = require('d3')
 
-export const drawSliders = (particleClasses, classesMatrix, w) => {
-  addSliders(particleClasses, classesMatrix, w)
+export const drawSliders = (world) => {
+  addSliders(world.particleClasses, world.classesMatrix, world.w)
   menuListener()
 }
 
