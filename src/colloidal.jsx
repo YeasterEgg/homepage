@@ -26,7 +26,8 @@ const world = {
   mouseActive: false,
   mouseXvel: 0,
   mouseYvel: 0,
-  systemEnergy: 3
+  systemEnergy: 3,
+  running: true
 }
 
 export const startAnimation = () => {
@@ -65,8 +66,36 @@ const startNewAnimation = (size = 3, particlesNumber = 200) => {
                        .style("opacity", 0)
   mouseListener(svg, mouseBall)
   const id = size + "_" + particlesNumber
+  pauseListener(particles, classesMatrix, mouseBall, id)
   document.workingAnimationFrames[id] = true
   window.requestAnimationFrame( () => {particlesUpdate(particles, classesMatrix, mouseBall, id)})
+}
+
+const pauseListener = (particles, classesMatrix, mouseBall, id) => {
+  const interactionSystemPause = d3.select(".colloidal-pause_button")
+  const particleSpeed = d3.select(".colloidal-particle_container")
+  interactionSystemPause.on("click", () => {
+    if(world.running){
+      document.workingAnimationFrames[id] = false
+      particleSpeed.style("display", "block")
+                   .transition()
+                   .duration(200)
+                   .style("opacity", 1)
+
+      d3.select(".material-icons").text("play_arrow")
+    }else{
+      document.workingAnimationFrames[id] = true
+      particleSpeed.transition()
+                   .duration(200)
+                   .style("opacity", 0)
+                   .on("end", () => {
+                      particleSpeed.style("display", "none")
+                   })
+      d3.select(".material-icons").text("pause")
+      window.requestAnimationFrame( () => {particlesUpdate(particles, classesMatrix, mouseBall, id)})
+    }
+    world.running = !world.running
+  })
 }
 
 const particleHash = (x, y, color, classId) => {

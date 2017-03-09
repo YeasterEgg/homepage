@@ -3,6 +3,7 @@ body{
   background-image: radial-gradient(#eef2f3 0%, #8e9eab 100%);
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 svg{

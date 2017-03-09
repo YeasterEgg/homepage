@@ -24,12 +24,17 @@ export class Particle {
                        .attr("cy", this.y)
                        .attr("fill", this.color)
     this.particle
-        .on("click", () => {this.onClick()})
+        .on("mouseover", () => {this.onMouseOver(world)})
+
+    this.particle
+        .on("mouseout", () => {this.onMouseOut(world)})
   }
 
-  onClick() {
-    this.xv = 0
-    this.yv = 0
+  onMouseOver(world) {
+    if(!world.running){
+      d3.select(".colloidal-particle_speed")
+        .text(Math.round(this.speed * 100) / 100 + " [x: " + (Math.round(this.xv * 100) / 100) + ";y: " + (Math.round(this.yv * 100) / 100) + "]")
+    }
   }
 
   updateAndMove(particles, matrix, world, mouseBall) {
@@ -106,7 +111,8 @@ export class Particle {
   }
 
   getMomentum() {
-    return this.w * Math.sqrt(this.xv ** 2 + this.yv ** 2)
+    this.speed = Math.sqrt(this.xv ** 2 + this.yv ** 2)
+    return this.w * this.speed
   }
 
   secretPenisSvg() {

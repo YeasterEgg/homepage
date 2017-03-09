@@ -3,11 +3,16 @@ body{
   margin: 0;
   padding: 0;
   color: #111;
+  overflow: hidden;
 }
 
 svg{
   background-color: #1A1624;
   cursor: pointer;
+}
+
+a{
+  color: #114
 }
 
 /* ELEMENTS ALWAYS VISIBLE */
@@ -33,6 +38,19 @@ svg{
   font-size: 20px;
   color: white;
   position: absolute;
+}
+
+.colloidal-particle_container{
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  font-size: 20px;
+  color: white;
+  position: absolute;
+  opacity: 0;
+  text-align: center;
+  display: none;
 }
 
 .colloidal-overlined{
@@ -91,6 +109,21 @@ svg{
   text-align: center;
   color: white;
   cursor: pointer;
+}
+
+.colloidal-pause_button{
+  position: absolute;
+  font-size: 40px;
+  top: 45%;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 50px;
+  width: 50px;
+  text-align: center;
+  background-color: #ddd;
+  border-radius: 25px;
+  cursor: pointer;
+  z-index: 15;
 }
 
 .colloidal-help_container{
