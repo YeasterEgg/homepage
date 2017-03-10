@@ -105,7 +105,7 @@ const inputListener = () => {
     systemEnergy: ["#colloidal-system_energy", (value, key) => {world[key] = parseInt(value)}],
     mouseWeight: ["#colloidal-mouse_weight", (value, key) => {world[key] = parseInt(value)}],
     currentClasses: ["#colloidal-size_input", setNewClassesNumber],
-    particlesNumber: ["colloidal-particles_number", setNewParticleNumber],
+    particlesNumber: ["#colloidal-particles_number", setNewParticleNumber],
     mouseRadius: ["#colloidal-mouse_radius", setMouseRadius]
   }
 
@@ -195,6 +195,7 @@ const mouseListener = () => {
 ///////////////////////
 
 const setNewParticleNumber = (newParticlesNumber) => {
+  console.log(newParticlesNumber)
   const diff = world.particlesNumber - parseInt(newParticlesNumber)
   let agendaParticle
   if(diff > 0){
@@ -205,7 +206,7 @@ const setNewParticleNumber = (newParticlesNumber) => {
   }else if(diff < 0){
     times(-diff, (idx) => {
       const agendaParticle = randomClassParticle(world.particlesNumber + idx)
-      agendaParticle.put(world.svg, world)
+      agendaParticle.put(world)
       world.particles.push(agendaParticle)
     })
   }

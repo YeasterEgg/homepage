@@ -38,6 +38,10 @@ def colloidal():
   send_to_telegram(text)
   return render_template("colloidal.html")
 
+@app.route("/whale", methods=["GET"])
+def whale():
+  return render_template("whale.html")
+
 @app.route("/visited_website", methods=["GET"])
 def visited():
   website = request.args.get("site")

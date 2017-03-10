@@ -45,7 +45,7 @@ const onChange = (slider, idx1, idx2, classesMatrix) => {
 const menuListener = () => {
   let menuVisible = false
   const sliderMenu = d3.select(".colloidal-menu_container")
-  d3.select(".colloidal-hamburg_menu").on("click", () => {
+  d3.select(".hamburg_menu").on("click", () => {
     if(menuVisible){
       sliderMenu.transition()
                 .duration(300)

@@ -1,0 +1,20 @@
+body{
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.hamburg_menu{
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  height: 50px;
+  width: 50px;
+  z-index: 15;
+  background-image: url("/static/pics/hamburg.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: pointer;
+}
