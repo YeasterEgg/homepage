@@ -62,12 +62,29 @@ def update_data():
   update_json(DB_FILE)
   return jsonify({"result": "ok"})
 
+# @app.route("/favicon", methods=["GET"])
+# def favicon():
+#   img_io = BytesIO()
+#   img = Image.new("RGB", (32,32))
+#   ## generatorz magic! just needed a few trials
+#   favicon = tuple(pixel for quadrant in list(pixel for pixel in (list(repeat(pixel,32 * 16)) for pixel in random_tuple(2))) for pixel in quadrant)
+#   img.putdata(favicon)
+#   img.save(img_io, 'PNG', quality=70)
+#   img_io.seek(0)
+#   return send_file(img_io, mimetype='image/png')
+
 @app.route("/favicon", methods=["GET"])
 def favicon():
   img_io = BytesIO()
   img = Image.new("RGB", (32,32))
-  ## generatorz magic! just needed a few trials
-  favicon = tuple(pixel for quadrant in list(pixel for pixel in (list(repeat(pixel,32 * 16)) for pixel in random_tuple(2))) for pixel in quadrant)
+  color1 = random_color()
+  color2 = random_color()
+  color3 = random_color()
+  color4 = random_color()
+  line1 = (color1) * 16 + (color2) * 16
+  line2 = (color3) * 16 + (color4) * 16
+  favicon = tuple(line1 * 16 + line2 * 16)
+  print(favicon)
   img.putdata(favicon)
   img.save(img_io, 'PNG', quality=70)
   img_io.seek(0)
