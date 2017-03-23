@@ -8,7 +8,7 @@ def update_json(db_file):
   data = json.loads(json_data)
   list(update_ratios(site) for site in data["sites"])
   json_file.seek(0)
-  json_file.write(json.dumps(data))
+  json_file.write(json.dumps(data, indent=2))
   json_file.truncate()
 
 def update_ratios(site):

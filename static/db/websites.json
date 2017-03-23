@@ -1,1 +1,134 @@
-{"sites": [{"url": "https://coop.grokked.it", "name": "CoopJukebox", "languages": ["React", "Meteor"], "ratios": {"HTML": 265, "CSS": 6475, "JavaScript": 54009}, "git": "https://github.com/YeasterEgg/coopjukebox", "description": "Questo sito permette di creare una playlist scelta tramite voti. Il primo passaggio \u00e8 l'accesso tramite il proprio utente Spotify, quindi si seleziona una playlist (o ne si crea una ex novo), infine si compila una lista di canzoni, tramite import di playlist o cercandole una ad una. Infine si fa partire la votazione. Al termine di ogni ciclo di votazioni (il primo dura 5 min, dal secondo in poi la durata dipende dalla canzone vincitrice), la canzone con pi\u00f9 voti verr\u00e0 accodata alla playlist. Chiunque potr\u00e0 votare accedendo alla url mostrata sulla pagina dell'utente che crea il sondaggio, oppure potr\u00e0 proporre una canzone che dal turno successivo far\u00e0 parte delle canzoni votabili.", "endpoint": "https://api.github.com/repos/YeasterEgg/coopjukebox", "length": 581}, {"url": "https://pymood.grokked.it", "name": "PyMood", "languages": ["Pandas", "Numpy", "Scikit-learn", "D3.js"], "ratios": {"Python": 19108, "Ruby": 3889, "HTML": 759, "CSS": 301, "JavaScript": 1247489}, "git": "https://github.com/YeasterEgg/spotify_classify", "description": "Un servizio API che riceve una lista di canzoni corredata dalle features offerte dall'API di Spotify e risponde dopo averla classificata (nel caso specifico, tra happy e sad). Utilizzata da Coop Jukebox. In homepage si pu\u00f2 vedere una heatmap della correlazione di Pearson tra le variabili e i relativi scatterplot di una parte del set di training.", "endpoint": "https://api.github.com/repos/YeasterEgg/spotify_classify", "length": 29007}, {"url": "https://barille.grokked.it?commander", "name": "Barille", "languages": ["Meteor", "Aframe"], "ratios": {"Python": 1682, "HTML": 107, "CSS": 2473, "JavaScript": 21524}, "git": "https://github.com/YeasterEgg/barille", "description": "Un sito che permette di caricare e visualizzare una proteina caricata da un file .pdb. Mentre un utente (che accede con parametro '?commander') pu\u00f2 muoversi liberamente, tutti gli utenti che accedono senza il parametro seguono il movimento, potendo eventualmente solo ruotare la visuale senza per\u00f2 muoversi nello spazio. Da mobile \u00e8 possibile usare un visore VR per avere una visione pi\u00f9 immersiva della molecola.", "endpoint": "https://api.github.com/repos/YeasterEgg/barille", "length": 39638}, {"url": "https://menuadhocbot.grokked.it", "name": "MenuAdHocBot", "languages": ["Sinatra", "Api.ai", "TelegramBot"], "ratios": {"Ruby": 14477, "CSS": 242, "HTML": 2500}, "git": "https://github.com/YeasterEgg/menuadhocbot", "description": "Un bot Telegram collegato al blog WP di ricette <a href='https://menuadhoc.it' target='_blank'>Menu ad Hoc</a> che tramite Api.ai permette di ricercare con facilit\u00e0 ricette per ingrediente, con la capacit\u00e0 di riconoscere la richiesta. Trascorsa la durata di preparazione della ricetta, il bot ricontatta per richiedere pareri circa la preparazione e la ricetta.", "endpoint": "https://api.github.com/repos/YeasterEgg/menuadhocbot", "length": 382}, {"url": "https://forgetmebot.grokked.it", "name": "ForgetMeBot", "languages": ["Sinatra", "TelegramBot"], "ratios": {"Ruby": 24673, "JavaScript": 692, "CSS": 56, "HTML": 4045}, "git": "https://github.com/YeasterEgg/forgetmebot", "description": "Un bot Telegram cui \u00e8 possibile chiedere di ricordare un evento nei minuti/ore/giorni successivi, e di ricordarlo ad altri utenti cui ci si pu\u00f2 collegare tramite 'amicizie' mediate da soprannomi. Per creare e distruggere amicizie si usano token generati per ogni utente.", "endpoint": "https://api.github.com/repos/YeasterEgg/forgetmebot", "length": 376}, {"url": "https://currency.grokked.it", "name": "Currency", "languages": ["D3.js", "Sanic", "Asyncio"], "ratios": {"Python": 3780, "Ruby": 3800, "HTML": 2216, "CSS": 420, "JavaScript": 1242261}, "git": "https://github.com/YeasterEgg/grokked", "description": "Rappresentazione con d3.js del rapporto di valore tra dollaro ed altre valute, in sviluppo l'evoluzione dei rapporti nel tempo per mostrare con rapido colpo d'occhio la forza di una valuta sopra le altre.", "endpoint": "https://api.github.com/repos/YeasterEgg/grokked", "length": 19618}, {"url": "https://grokked.it", "name": "Homepage", "languages": ["D3.js", "Flask", "SocketIO"], "ratios": {"Python": 3748, "Ruby": 3739, "HTML": 674, "CSS": 166, "JavaScript": 1942526}, "git": "https://github.com/YeasterEgg/homepage", "description": "La mia homepage.", "endpoint": "https://api.github.com/repos/YeasterEgg/homepage", "length": 24530}]}
+{
+  "sites": [
+    {
+      "ratios": {
+        "JavaScript": 54009,
+        "HTML": 265,
+        "CSS": 6475
+      },
+      "description": "Questo sito permette di creare una playlist scelta tramite voti. Il primo passaggio \u00e8 l'accesso tramite il proprio utente Spotify, quindi si seleziona una playlist (o ne si crea una ex novo), infine si compila una lista di canzoni, tramite import di playlist o cercandole una ad una. Infine si fa partire la votazione. Al termine di ogni ciclo di votazioni (il primo dura 5 min, dal secondo in poi la durata dipende dalla canzone vincitrice), la canzone con pi\u00f9 voti verr\u00e0 accodata alla playlist. Chiunque potr\u00e0 votare accedendo alla url mostrata sulla pagina dell'utente che crea il sondaggio, oppure potr\u00e0 proporre una canzone che dal turno successivo far\u00e0 parte delle canzoni votabili.",
+      "name": "CoopJukebox",
+      "url": "https://coop.grokked.it",
+      "length": 581,
+      "languages": [
+        "React",
+        "Meteor"
+      ],
+      "endpoint": "https://api.github.com/repos/YeasterEgg/coopjukebox",
+      "git": "https://github.com/YeasterEgg/coopjukebox"
+    },
+    {
+      "ratios": {
+        "Ruby": 3889,
+        "JavaScript": 1305731,
+        "CSS": 477,
+        "HTML": 653,
+        "Python": 19108
+      },
+      "description": "Un servizio API che riceve una lista di canzoni corredata dalle features offerte dall'API di Spotify e risponde dopo averla classificata (nel caso specifico, tra happy e sad). Utilizzata da Coop Jukebox.",
+      "name": "PyMood",
+      "url": "https://pymood.grokked.it",
+      "length": 29405,
+      "languages": [
+        "Pandas",
+        "Numpy",
+        "Scikit-learn"
+      ],
+      "endpoint": "https://api.github.com/repos/YeasterEgg/spotify_classify",
+      "git": "https://github.com/YeasterEgg/spotify_classify"
+    },
+    {
+      "ratios": {
+        "JavaScript": 21524,
+        "Python": 1682,
+        "HTML": 107,
+        "CSS": 2473
+      },
+      "description": "Un sito che permette di caricare e visualizzare una proteina caricata da un file .pdb. Mentre un utente (che accede con parametro '?commander') pu\u00f2 muoversi liberamente, tutti gli utenti che accedono senza il parametro seguono il movimento, potendo eventualmente solo ruotare la visuale senza per\u00f2 muoversi nello spazio. Da mobile \u00e8 possibile usare un visore VR per avere una visione pi\u00f9 immersiva della molecola.",
+      "name": "Barille",
+      "url": "https://barille.grokked.it?commander",
+      "length": 39638,
+      "languages": [
+        "Meteor",
+        "Aframe"
+      ],
+      "endpoint": "https://api.github.com/repos/YeasterEgg/barille",
+      "git": "https://github.com/YeasterEgg/barille"
+    },
+    {
+      "ratios": {
+        "CSS": 242,
+        "HTML": 2500,
+        "Ruby": 14477
+      },
+      "description": "Un bot Telegram collegato al blog WP di ricette <a href='https://menuadhoc.it' target='_blank'>Menu ad Hoc</a> che tramite Api.ai permette di ricercare con facilit\u00e0 ricette per ingrediente, con la capacit\u00e0 di riconoscere la richiesta. Trascorsa la durata di preparazione della ricetta, il bot ricontatta per richiedere pareri circa la preparazione e la ricetta.",
+      "name": "MenuAdHocBot",
+      "url": "https://menuadhocbot.grokked.it",
+      "length": 382,
+      "languages": [
+        "Sinatra",
+        "Api.ai",
+        "TelegramBot"
+      ],
+      "endpoint": "https://api.github.com/repos/YeasterEgg/menuadhocbot",
+      "git": "https://github.com/YeasterEgg/menuadhocbot"
+    },
+    {
+      "ratios": {
+        "JavaScript": 692,
+        "CSS": 56,
+        "HTML": 4045,
+        "Ruby": 24673
+      },
+      "description": "Un bot Telegram cui \u00e8 possibile chiedere di ricordare un evento nei minuti/ore/giorni successivi, e di ricordarlo ad altri utenti cui ci si pu\u00f2 collegare tramite 'amicizie' mediate da soprannomi. Per creare e distruggere amicizie si usano token generati per ogni utente.",
+      "name": "ForgetMeBot",
+      "url": "https://forgetmebot.grokked.it",
+      "length": 376,
+      "languages": [
+        "Sinatra",
+        "TelegramBot"
+      ],
+      "endpoint": "https://api.github.com/repos/YeasterEgg/forgetmebot",
+      "git": "https://github.com/YeasterEgg/forgetmebot"
+    },
+    {
+      "ratios": {
+        "Ruby": 3800,
+        "JavaScript": 1242261,
+        "Python": 3780,
+        "HTML": 2216,
+        "CSS": 420
+      },
+      "description": "Esperimenti, pagine singole alcune delle quali in continua evoluzione.",
+      "name": "Experiments",
+      "url": "https://experiments.grokked.it",
+      "length": 19618,
+      "languages": [
+        "D3.js",
+        "Flask"
+      ],
+      "endpoint": "https://api.github.com/repos/YeasterEgg/experiments",
+      "git": "https://github.com/YeasterEgg/experiments"
+    },
+    {
+      "ratios": {
+        "Ruby": 3739,
+        "JavaScript": 1960224,
+        "CSS": 844,
+        "HTML": 761,
+        "Python": 4139
+      },
+      "description": "La mia homepage.",
+      "name": "Homepage",
+      "url": "https://grokked.it",
+      "length": 21561,
+      "languages": [
+        "D3.js",
+        "Flask",
+        "SocketIO"
+      ],
+      "endpoint": "https://api.github.com/repos/YeasterEgg/homepage",
+      "git": "https://github.com/YeasterEgg/homepage"
+    }
+  ]
+}
