@@ -95,7 +95,7 @@ def website_selected(data):
   text = "We bellezza, qualcuno ha cliccato sulla cellula di {website}, micacazzi!".format(website=website)
   send_to_telegram(text)
 
-def random_tuple(n = 1):
+def random_color(n = 1):
   return tuple((randint(0,255), randint(0,255), randint(0,255)) for i in range(n))
 
 def visited_website(website):
