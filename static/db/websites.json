@@ -100,15 +100,15 @@
         "CSS": 420
       },
       "description": "Esperimenti, pagine singole alcune delle quali in continua evoluzione.",
-      "name": "Experiments",
-      "url": "https://experiments.grokked.it",
+      "name": "Playground",
+      "url": "https://playground.grokked.it",
       "length": 19618,
       "languages": [
         "D3.js",
         "Flask"
       ],
-      "endpoint": "https://api.github.com/repos/YeasterEgg/experiments",
-      "git": "https://github.com/YeasterEgg/experiments"
+      "endpoint": "https://api.github.com/repos/YeasterEgg/playground",
+      "git": "https://github.com/YeasterEgg/playground"
     },
     {
       "ratios": {
